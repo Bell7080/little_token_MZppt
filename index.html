@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Little Token — 2026 NEXON AI 게임잼 · 1조</title>
+<link rel="icon" href="assets/img/token_neutral.webp" />
+<link rel="stylesheet" href="css/deck.css" />
+</head>
+<body>
+
+<div id="viewport">
+  <div class="stage" id="stage">
+
+    <div id="fireflies"></div>
+    <div id="grain"></div>
+    <div id="progress"></div>
+    <div id="flash"></div>
+
+    <div id="chapter-mark"><b>00</b> / 시작</div>
+
+    <div id="deck">
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           CH.1 — 훅: 문맥은 펭귄이다
+           단어 「펭귄」은 화면 정중앙에 못 박혀 있고, 앞뒤 맥락만 갈아끼운다.
+           ══════════════════════════════════════════════════════════════════ -->
+      <section class="slide" data-chapter="맥락" data-steps="4" data-hint="Space — 맥락을 한 겹씩 붙입니다">
+        <!-- 「펭귄」은 화면에 못 박혀 있고, 앞뒤만 갈아끼운다 -->
+        <div class="penguin-line">
+          <span class="ctx-swap" id="pg-prefix"><span class="sw">문맥은&nbsp;</span></span><span
+                class="ctx-anchor">펭귄</span><span class="ctx-tail" id="pg-tail">이다.</span>
+        </div>
+        <div class="penguin-line sub ctx-part" data-step="1" style="margin-top:40px">펭귄은 조류이다.</div>
+        <div class="meaning" data-step="1">한 마디가 붙자 — <b>「펭귄」은 새가 되었다</b></div>
+        <div class="meaning" data-step="2">앞을 갈아끼웠을 뿐인데 — <b>완전히 다른 말</b>이 되었다</div>
+        <div class="meaning" data-step="3" style="font-size:44px; color:var(--gold-hi)">
+          단어는 그대로다. <b>앞뒤가 바뀌면 전부 바뀐다.</b>
+        </div>
+      </section>
+
+      <!-- CH.1 결론 — 맥락의 정의 · 슬롯1 획득 -->
+      <section class="slide" data-chapter="맥락" data-win="0"
+               data-hint="문장 바에 첫 단어가 채워집니다">
+        <div class="slide-bg" data-src="assets/img/bg_night.webp" style="--bg-opacity:.22"></div>
+        <div class="eyebrow reveal">CONTEXT</div>
+        <h2 class="reveal" style="--d:.12s">
+          맥락은 <span class="gold">단어에 들어 있지 않다.</span><br />
+          <span class="gold">단어와 단어 사이</span>에 있다.
+        </h2>
+        <p class="lead reveal" style="--d:.3s">
+          그래서 저희는 맥락을 설명하는 게임이 아니라,<br />
+          <span class="teal">맥락이 곧 규칙인 게임</span>을 만들기로 했습니다.
+        </p>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           CH.2 — 타이틀 리빌
+           ══════════════════════════════════════════════════════════════════ -->
+      <section class="slide" data-chapter="게임" data-video="opening" data-hint="오프닝 시네마틱">
+        <video class="cine" data-src="assets/video/opening.webm" muted playsinline
+               style="--cine-opacity:.62"></video>
+        <div class="cine-veil"></div>
+        <div class="eyebrow reveal">2026 NEXON AI 게임잼 · 주제 「맥락」 · 1조</div>
+        <h1 class="reveal" style="--d:.15s; font-size:150px">Little Token</h1>
+        <p class="lead reveal" style="--d:.35s; font-size:38px; color:var(--ink)">
+          문장을 조립해 이야기를 지키는<br /><span class="gold">단어장 덱빌딩 로그라이트</span>
+        </p>
+      </section>
+
+      <!-- 게임 소개 + 실측 스펙 · 슬롯2 획득 -->
+      <section class="slide" data-chapter="게임" data-win="1">
+        <div class="slide-bg" data-src="assets/img/bg_field.webp" style="--bg-opacity:.26"></div>
+        <div class="eyebrow reveal">WHAT WE BUILT</div>
+        <h2 class="reveal" style="--d:.1s; font-size:56px">
+          벌레들이 <span class="dim">이야기를 갉아먹는다.</span><br />
+          소년은 <span class="gold">문장을 써서</span> 이야기를 지킨다.
+        </h2>
+        <!-- 이야기를 갉아먹는 벌레들 — 게임 스프라이트 그대로 -->
+        <div class="bug-row reveal" style="--d:.25s">
+          <img src="assets/enemy/enemy_moth.webp" alt="좀나방" />
+          <img src="assets/enemy/enemy_roach.webp" alt="바퀴" />
+          <img src="assets/enemy/enemy_pillbug.webp" alt="공벌레" />
+          <img src="assets/enemy/enemy_mosquito.webp" alt="모기" />
+          <img src="assets/enemy/boss_mantis.webp" alt="사마귀" />
+          <img src="assets/enemy/boss_queen_bee.webp" alt="여왕벌" />
+          <img src="assets/enemy/boss_elder_spider.webp" alt="장로거미" />
+        </div>
+        <div class="grid g4 reveal" style="--d:.35s; margin-top:44px; max-width:1400px">
+          <div class="panel stat-tile"><div class="v" data-count="91">0</div><div class="l">커밋</div></div>
+          <div class="panel stat-tile"><div class="v" data-count="75">0</div><div class="l">단어</div></div>
+          <div class="panel stat-tile"><div class="v" data-count="34">0</div><div class="l">관용구</div></div>
+          <div class="panel stat-tile"><div class="v">48<span style="font-size:34px">h</span></div><div class="l">2박 3일</div></div>
+        </div>
+        <p class="note reveal" style="--d:.6s; margin-top:40px">
+          처음 만난 4명 · <span class="gold">v_0.5.37</span> · TypeScript + Vite + Three.js
+        </p>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           CH.3 — 문장이 곧 전투다
+           ══════════════════════════════════════════════════════════════════ -->
+      <section class="slide" data-chapter="메카닉">
+        <div class="eyebrow reveal">CORE MECHANIC</div>
+        <h2 class="reveal" style="--d:.1s">플레이어는 카드를 내지 않습니다.<br /><span class="gold">문장을 씁니다.</span></h2>
+        <div class="grid g3 reveal" style="--d:.35s; margin-top:66px; max-width:1500px">
+          <div class="panel">
+            <span class="kicker">SLOT 1</span><h3>주어</h3>
+            <p>「나는」 「다친 나는」 「우리는」<br />누가 쓰는 문장인가</p>
+          </div>
+          <div class="panel">
+            <span class="kicker">SLOT 2</span><h3>수식어</h3>
+            <p>「살짝」 「힘껏」 「미친듯이」<br />어떤 마음으로 쓰는가</p>
+          </div>
+          <div class="panel">
+            <span class="kicker">SLOT 3</span><h3>동사</h3>
+            <p>「때렸다」 「막았다」 「감쌌다」<br />무슨 일이 벌어지는가</p>
+          </div>
+        </div>
+        <p class="lead reveal" style="--d:.6s">
+          같은 동사라도 <span class="gold">앞에 무엇이 오느냐</span>에 따라<br />
+          발동 여부·행동 종류·배수·부가 효과가 전부 달라집니다.
+        </p>
+      </section>
+
+      <!-- 플레이어블 조립기 -->
+      <section class="slide" id="playable" data-chapter="메카닉"
+               data-hint="카드를 클릭해 문장을 완성하세요 · R 초기화">
+        <div class="slide-bg" data-src="assets/img/bg_dark.webp" style="--bg-opacity:.3"></div>
+        <div class="assembler">
+          <div class="sentence-line" id="sentence"></div>
+          <div class="hand" id="hand"></div>
+          <div class="result" id="result">
+            <div>
+              <div class="combo-list" id="combos"></div>
+              <div class="formula" id="formula"></div>
+            </div>
+            <div class="damage" id="damage">
+              <div class="damage-label" id="damage-label">DAMAGE</div>
+              <div class="damage-value" id="damage-value">0</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 관용구 34종 · 슬롯3 획득 -->
+      <section class="slide" data-chapter="메카닉" data-win="2" data-combo-grid="1">
+        <div class="eyebrow reveal">IDIOMS</div>
+        <h2 class="reveal" style="--d:.1s; font-size:56px">
+          숨은 정답이 아닙니다. <span class="gold">발견하는 규칙</span>입니다.
+        </h2>
+        <p class="lead reveal" style="--d:.25s; margin-top:22px; margin-bottom:44px">
+          태그가 맞물리면 관용구가 터집니다. 게임에서 <span class="gold">유일한 곱셈 요소</span>이고, <span class="gold">배수 상한은 없습니다.</span>
+        </p>
+        <div class="combo-grid reveal" id="combo-grid" style="--d:.4s"></div>
+        <p class="note reveal" style="--d:.7s; margin-top:34px">
+          「고르면 손해」인 선택지는 하나도 없습니다. 실패·자해·부조화 패널티는 전부 폐지했습니다. —
+          <span class="dim">선택지는 손해와 이득이 아니라 <span class="gold">이득의 종류</span>로 갈립니다.</span>
+        </p>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           CH.4 — 맥락은 이어진다 (로그라이트) + 보스 컷씬
+           ══════════════════════════════════════════════════════════════════ -->
+      <section class="slide" data-chapter="로그라이트" data-video="boss" data-hint="5층 보스 컷신">
+        <video class="cine" data-src="assets/video/boss.webm" muted playsinline
+               style="--cine-opacity:.6"></video>
+        <div class="cine-veil"></div>
+        <div class="eyebrow reveal">ROGUELITE</div>
+        <h2 class="reveal" style="--d:.12s">
+          맥락은 한 번 만들어지고<br /><span class="gold">끝나지 않습니다.</span>
+        </h2>
+        <p class="lead reveal" style="--d:.32s">
+          매 전투마다 새 단어가 단어장에 등록되고, 그 단어가 기존 단어와 만나<br />
+          <span class="teal">전에 없던 관용구</span>를 만듭니다. 같은 덱이라도 <span class="teal">연결 순서</span>가 다르면 완전히 다른 런이 됩니다.
+        </p>
+        <div class="grid g3 reveal" style="--d:.55s; margin-top:64px; max-width:1400px">
+          <div class="panel"><h3>15층</h3><p>층마다 적 구성과 필드 효과가 바뀝니다</p></div>
+          <div class="panel"><h3>보스 4종</h3><p>사마귀 · 여왕벌 · 장로거미 · 먹물 왕바퀴<br />각자 방어를 무력화하는 고유 수단을 가집니다</p></div>
+          <div class="panel"><h3>부위 파괴</h3><p>약점과 관용구를 <span class="gold">함께</span> 맞힌 문장만 다음 부위로 관통합니다</p></div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           CH.5 — AI (핵심 배점 구간)
+           ══════════════════════════════════════════════════════════════════ -->
+      <section class="slide" data-chapter="AI">
+        <div class="eyebrow reveal">HOW WE USED AI</div>
+        <h2 class="reveal" style="--d:.1s; font-size:60px">
+          "어디에 썼나요"보다<br /><span class="gold">"안 쓴 곳을 찾는 게" 더 어렵습니다.</span>
+        </h2>
+        <div class="pipeline reveal" style="--d:.35s; margin-top:70px; max-width:1620px">
+          <div class="pipe-node"><span class="n">기획</span><span class="d">주제 해석 · 시스템 설계<br />단어/관용구 테이블</span></div>
+          <div class="pipe-node"><span class="n">아트</span><span class="d">배경 6 · 벌레 스프라이트<br />스킬 아이콘 100+</span></div>
+          <div class="pipe-node"><span class="n">3D</span><span class="d">GLB 12종<br />idle · attack · defeat</span></div>
+          <div class="pipe-node"><span class="n">사운드</span><span class="d">BGM · SFX<br />27트랙</span></div>
+          <div class="pipe-node"><span class="n">코드</span><span class="d">TypeScript 구현<br />디버깅 · 최적화</span></div>
+          <div class="pipe-node"><span class="n">밸런스</span><span class="d">전수 시뮬레이션<br />레벨 디자인</span></div>
+        </div>
+        <p class="lead reveal" style="--d:.6s">
+          4명이 48시간 안에 이 볼륨을 만들 수 있었던 이유는<br />
+          <span class="gold">AI를 도구가 아니라 팀원으로 붙였기 때문</span>입니다.
+        </p>
+      </section>
+
+      <!-- AGENTS.md = AI 온보딩 -->
+      <section class="slide" data-chapter="AI">
+        <div class="eyebrow reveal">AI ONBOARDING</div>
+        <h2 class="reveal" style="--d:.1s; font-size:56px">
+          코드를 시키기 전에 <span class="gold">기획 헌법</span>을 먼저 썼습니다.
+        </h2>
+        <div class="grid g2 reveal" style="--d:.35s; margin-top:56px; max-width:1560px; align-items:start">
+          <div class="code">
+<span class="c"># AGENTS.md — 262줄</span>
+
+<span class="k">## 맥락이 메카닉이다</span>
+단어 하나의 값은 고정된 카드 수치만으로
+결정되지 <span class="s">않는다</span>. 앞뒤에 어떤 단어가
+오는지에 따라 (…) 배수와 부가 효과가
+달라져야 한다.
+
+<span class="k">## 디메리트를 두지 않는다</span>
+"고르면 손해"인 선택지는 <span class="s">폐지했다</span>.
+(…) 되살리지 <span class="s">않는다</span>.
+
+<span class="k">## 전투 로직 불변식</span>
+<span class="s">compiler.ts</span>는 순수함수로 유지한다.
+RNG와 화면 상태를 참조하지 않는다.
+          </div>
+          <div style="display:flex; flex-direction:column; gap:22px">
+            <div class="panel">
+              <h3>왜 헌법이 먼저인가</h3>
+              <p>AI에게 "카드 게임 만들어줘"라고 하면 <span class="dim">평균적인 카드 게임</span>이 나옵니다.
+              지켜야 할 <span class="gold">불변식</span>을 먼저 못 박아두면, AI가 코드를 짜든 밸런스를 잡든
+              <span class="gold">우리 게임의 방향</span>으로 수렴합니다.</p>
+            </div>
+            <div class="panel">
+              <h3>그래서 생긴 일</h3>
+              <p>4명이 각자 다른 파트를 AI와 병렬로 진행해도
+              <span class="teal">규칙이 서로 어긋나지 않았습니다.</span>
+              48시간짜리 팀에서 이게 가장 큰 비용 절감이었습니다.</p>
+            </div>
+            <div class="panel">
+              <h3>사람이 한 일</h3>
+              <p><span class="gold">무엇을 만들지 정하고, 재미를 판정하고, 방향을 되돌리는 것.</span>
+              AI는 그 판단을 실행 가능한 속도로 바꿔줬습니다.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 조합 폭발 -->
+      <section class="slide" data-chapter="AI">
+        <div class="eyebrow reveal">WHAT HUMANS COULDN'T DO</div>
+        <h2 class="reveal" style="--d:.1s; font-size:58px">
+          맥락이 메카닉이면 <span class="gold">경우의 수가 폭발합니다.</span>
+        </h2>
+        <p class="lead reveal" style="--d:.25s">
+          단어 75개 × 관용구 34개 × 슬롯 3칸 × 아이템 패시브 × 필드 효과.<br />
+          <span class="dim">손으로 밸런스를 잡는 건 물리적으로 불가능합니다.</span>
+        </p>
+        <div class="grid g2 reveal" style="--d:.45s; margin-top:56px; max-width:1500px">
+          <div class="panel">
+            <span class="kicker">npm run sweep</span>
+            <h3>전 조합 전수 검사</h3>
+            <p>가능한 모든 문장을 컴파일해 <span class="gold">배수 분포·불변식 위반</span>을 자동 검출합니다.
+            데이터를 고칠 때마다 돌렸습니다.</p>
+          </div>
+          <div class="panel">
+            <span class="kicker">npm run boss:sim</span>
+            <h3>보스 패턴 검수</h3>
+            <p>전투 길이뿐 아니라 <span class="gold">패턴이 실제로 몇 번 발동했는지</span>까지 셉니다.
+            예고·소환·부위 파훼가 0이면 그 보스는 <span class="dim">수치만 큰 허수아비</span>라서요.</p>
+          </div>
+        </div>
+        <p class="lead reveal" style="--d:.65s; font-size:36px; color:var(--gold-hi)">
+          AI가 만든 건 에셋만이 아닙니다. <span class="teal">검증 도구까지 만들었습니다.</span>
+        </p>
+      </section>
+
+      <!-- 48시간 볼륨 · 슬롯4 획득 -->
+      <section class="slide" data-chapter="AI" data-win="3">
+        <div class="slide-bg" data-src="assets/img/bg_title.webp" style="--bg-opacity:.2"></div>
+        <div class="eyebrow reveal">48 HOURS</div>
+        <h2 class="reveal" style="--d:.1s; font-size:56px">48시간 뒤에 남은 것</h2>
+        <div class="grid g4 reveal" style="--d:.3s; margin-top:60px; max-width:1500px">
+          <div class="panel stat-tile"><div class="v" data-count="12">0</div><div class="l">3D 모델 (GLB)</div></div>
+          <div class="panel stat-tile"><div class="v" data-count="27">0</div><div class="l">오디오 트랙</div></div>
+          <div class="panel stat-tile"><div class="v" data-count="100">0</div><div class="l">스킬 아이콘</div></div>
+          <div class="panel stat-tile"><div class="v" data-count="6">0</div><div class="l">배경 원화</div></div>
+        </div>
+        <p class="lead reveal" style="--d:.55s">
+          전부 <span class="gold">플레이 가능한 빌드 안에</span> 들어가 있습니다.<br />
+          <span class="dim">기획서 속 계획이 아니라, 지금 돌아가는 게임입니다.</span>
+        </p>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           CH.6 — 메타 펀치 + 마무리
+           ══════════════════════════════════════════════════════════════════ -->
+      <section class="slide" data-chapter="AI" data-hint="이 발표 자료 자체가 증거입니다">
+        <div class="eyebrow reveal">ONE MORE THING</div>
+        <h2 class="reveal" style="--d:.12s; font-size:64px">
+          그리고 <span class="gold">지금 보고 계신 이 발표 자료도</span>
+        </h2>
+        <p class="lead reveal" style="--d:.32s; font-size:36px">
+          파워포인트가 아닙니다. <span class="teal">HTML입니다.</span><br />
+          AI가 <span class="gold">Little Token의 저장소를 통째로 읽고</span> 만들었습니다.
+        </p>
+        <div class="grid g3 reveal" style="--d:.5s; margin-top:56px; max-width:1500px">
+          <div class="panel">
+            <h3>색을 가져온 게 아니라</h3>
+            <p>게임 <span class="s gold">style.css</span>의 팔레트 변수를 그대로 읽어왔습니다.
+            이 화면의 금빛은 <span class="gold">#ffcf76</span> — 게임과 <span class="gold">같은 값</span>입니다.
+            폰트도 게임의 <span class="gold">Griun</span> 그대로입니다.</p>
+          </div>
+          <div class="panel">
+            <h3>수치를 옮긴 게 아니라</h3>
+            <p>앞에서 보신 전투는 <span class="gold">진짜로 계산된 것</span>입니다.
+            <span class="s gold">combos.csv</span> 34개와 <span class="s gold">compiler.ts</span>의 공식을
+            이 페이지가 그대로 돌립니다.</p>
+          </div>
+          <div class="panel">
+            <h3>구조까지 가져왔습니다</h3>
+            <p>1920×1080 고정 무대를 뷰포트에 맞춰 축소하는 방식도 게임과 동일합니다.
+            <span class="dim">발표 자료와 게임이 같은 규칙 위에 서 있습니다.</span></p>
+          </div>
+        </div>
+        <p class="lead reveal" style="--d:.72s; font-size:38px; color:var(--gold-hi); max-width:1520px">
+          AI를 <span class="teal">"어디에 썼는지" 설명하는 대신,</span><br />
+          설명하는 자료 자체를 AI로 만들었습니다.
+        </p>
+      </section>
+
+      <!-- 문장 완성 + 마무리 -->
+      <section class="slide" id="finale" data-chapter="마무리" data-hint="Space — 문장을 완성합니다">
+        <div class="slide-bg" data-src="assets/img/bg_title.webp" style="--bg-opacity:.24"></div>
+        <div class="eyebrow reveal">1조 · 2026 NEXON AI 게임잼</div>
+        <h1 class="reveal" style="--d:.15s; font-size:104px">Little Token</h1>
+        <p class="lead reveal" style="--d:.35s; font-size:31px; margin-top:24px">
+          처음 만난 네 사람이 <span class="gold">「맥락」</span>이라는 단어 하나를
+          48시간 동안 <span class="gold">규칙으로 번역한 결과</span>입니다.
+        </p>
+        <p class="lead reveal" style="--d:.55s; font-size:28px; color:var(--ink-faint); margin-top:20px">
+          플레이하시면서 <span class="teal">"아, 이런 문장도 되네?"</span> 하는 순간이
+          한 번이라도 있었다면 — 저희 의도는 전달된 겁니다.
+        </p>
+        <p class="note reveal" style="--d:.75s; margin-top:26px">감사합니다.</p>
+      </section>
+
+    </div><!-- /#deck -->
+
+    <!-- ────────────────────────────────────────────────────────────────────
+         토큰 — 게임의 안내 요정이 발표에서도 그대로 안내를 맡는다
+         ──────────────────────────────────────────────────────────────────── -->
+    <div id="token-stage" class="hidden">
+      <div id="token-wrap">
+        <div id="token-dust"></div>
+        <img id="token" src="assets/img/token_neutral.webp" alt="토큰" />
+      </div>
+      <div id="token-bubble"></div>
+    </div>
+
+    <!-- 발표 전체를 관통하는 문장 — 진행하면서 한 칸씩 채워진다 -->
+    <div id="meta-sentence" class="hidden"></div>
+    <div id="hint"></div>
+
+    <div id="overview"><div class="ov-grid" id="ov-grid"></div></div>
+  </div>
+</div>
+
+<!-- 연필 커서 -->
+<svg id="pencil" viewBox="0 0 32 32" fill="none">
+  <path d="M4 28l1.6-6.2L21.4 6 26 10.6 10.2 26.4 4 28z" fill="#ffcf76" stroke="#2a1c10" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="M21.4 6l2.2-2.2a2 2 0 0 1 2.8 0l1.8 1.8a2 2 0 0 1 0 2.8L26 10.6 21.4 6z" fill="#e79a3c" stroke="#2a1c10" stroke-width="1.4"/>
+  <path d="M5.6 21.8L10.2 26.4" stroke="#2a1c10" stroke-width="1.4"/>
+</svg>
+
+<script type="module" src="js/deck.js"></script>
+</body>
+</html>

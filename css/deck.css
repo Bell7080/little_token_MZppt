@@ -1,0 +1,638 @@
+/* =============================================================================
+   Little Token — 발표 덱 디자인 시스템
+   게임 src/style.css 의 팔레트·유리 패널·발광 규칙을 그대로 이식했다.
+   무대는 게임과 동일하게 1920×1080 고정 후 뷰포트에 맞춰 축소한다.
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Griun';
+  src: url('../assets/font/Griun_PolFairness-Rg.woff2') format('woff2');
+  font-display: block;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  background: #07060a;
+  -webkit-user-select: none; user-select: none;
+  cursor: none;
+}
+
+:root {
+  /* ── 게임 팔레트 ── */
+  --paper: #f6ecd6;
+  --ink: #f4e8cf;
+  --ink-dim: #cdbb98;
+  --ink-faint: #9a8b72;
+  --gold: #ffcf76;
+  --gold-hi: #ffe4a8;
+  --gold-deep: #e79a3c;
+  --glow: #ffd27a;
+  --teal: #7fc7cb;
+  --rare: #6fc6dd;
+  --epic: #c79bf0;
+  --danger: #ff8a6a;
+  --heal: #9fe27a;
+  --glass: rgba(26, 18, 30, 0.62);
+  --glass-strong: rgba(20, 14, 24, 0.8);
+  --glass-hi: rgba(255, 240, 210, 0.1);
+  --font: 'Griun', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', system-ui, sans-serif;
+}
+
+#viewport {
+  position: fixed; inset: 0; overflow: hidden;
+  background: radial-gradient(ellipse at center, #14101a 0%, #060509 100%);
+}
+
+.stage {
+  position: absolute; left: 50%; top: 50%;
+  width: 1920px; height: 1080px;
+  transform-origin: center center;
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
+  overflow: hidden;
+  font-family: var(--font);
+  font-size: 20px; line-height: 1.5;
+  color: var(--ink);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   반딧불이 — 게임 타이틀의 시그니처
+   ═══════════════════════════════════════════════════════════════════════════ */
+#fireflies { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.firefly {
+  position: absolute; border-radius: 50%;
+  background: var(--glow);
+  box-shadow: 0 0 8px 2px rgba(255, 210, 122, 0.7), 0 0 22px 6px rgba(255, 210, 122, 0.28);
+  animation: drift var(--dur) ease-in-out infinite alternate, blink var(--blink) ease-in-out infinite;
+}
+@keyframes drift {
+  from { transform: translate(0, 0); }
+  to   { transform: translate(var(--dx), var(--dy)); }
+}
+@keyframes blink { 0%, 100% { opacity: 0.15; } 50% { opacity: 1; } }
+
+/* 종이 결 — 그림일기 질감 */
+#grain {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  opacity: 0.05; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   슬라이드
+   ═══════════════════════════════════════════════════════════════════════════ */
+#deck { position: absolute; inset: 0; z-index: 5; }
+
+.slide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 100px 140px 190px;
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.5s ease, visibility 0.5s;
+}
+.slide.active { opacity: 1; visibility: visible; }
+
+/* 피날레는 토큰이 무대 한가운데로 날아오므로 본문을 위로 비켜 준다 */
+#finale { justify-content: flex-start; padding-top: 96px; }
+
+/* 슬라이드 배경 아트 */
+.slide-bg {
+  position: absolute; inset: 0; z-index: -2;
+  background-size: cover; background-position: center;
+  opacity: 0; transition: opacity 1.2s ease, transform 8s linear;
+  transform: scale(1.06);
+}
+.slide.active .slide-bg { opacity: var(--bg-opacity, 0.3); transform: scale(1.14); }
+.slide-bg::after {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, rgba(6, 5, 9, 0.35) 0%, rgba(6, 5, 9, 0.92) 78%);
+}
+
+/* ── 등장 연출 — 잉크가 번지듯 아래에서 써진다 ── */
+.reveal { opacity: 0; transform: translateY(28px); filter: blur(6px); }
+.slide.active .reveal {
+  animation: inkIn 0.85s cubic-bezier(0.2, 0.9, 0.25, 1) forwards;
+  animation-delay: var(--d, 0s);
+}
+@keyframes inkIn {
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   타이포
+   ═══════════════════════════════════════════════════════════════════════════ */
+.eyebrow {
+  font-size: 22px; letter-spacing: 0.42em; text-transform: uppercase;
+  color: var(--gold-deep); margin-bottom: 30px;
+  display: flex; align-items: center; gap: 18px;
+}
+.eyebrow::before, .eyebrow::after {
+  content: ''; height: 1px; width: 60px;
+  background: linear-gradient(90deg, transparent, var(--gold-deep));
+}
+.eyebrow::after { background: linear-gradient(90deg, var(--gold-deep), transparent); }
+
+h1 {
+  font-size: 108px; font-weight: 400; line-height: 1.16;
+  color: var(--gold-hi); text-align: center;
+  text-shadow: 0 0 40px rgba(255, 210, 122, 0.35), 0 6px 30px rgba(0, 0, 0, 0.6);
+}
+h2 {
+  font-size: 72px; font-weight: 400; line-height: 1.24;
+  color: var(--ink); text-align: center;
+}
+.lead {
+  font-size: 32px; color: var(--ink-dim); text-align: center;
+  max-width: 1180px; line-height: 1.66; margin-top: 34px;
+}
+.note { font-size: 24px; color: var(--ink-faint); }
+.gold { color: var(--gold); }
+.teal { color: var(--teal); }
+.epic-c { color: var(--epic); }
+.dim { color: var(--ink-faint); }
+.big-num {
+  font-size: 96px; color: var(--gold-hi); line-height: 1;
+  text-shadow: 0 0 34px rgba(255, 210, 122, 0.42);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CH.1 — 펭귄 훅: 단어는 고정, 앞뒤 맥락만 갈아끼운다
+   ═══════════════════════════════════════════════════════════════════════════ */
+.penguin-line {
+  display: flex; align-items: baseline; justify-content: center;
+  font-size: 84px; line-height: 1.3; min-height: 120px;
+  white-space: pre;
+}
+.penguin-line.sub { font-size: 68px; color: var(--ink-dim); }
+.ctx-tail { color: var(--ink-dim); }
+
+/* 앞 맥락 — 통째로 갈아끼워진다 */
+.ctx-swap { display: inline-block; color: var(--ink-dim); position: relative; }
+.ctx-swap .sw { display: inline-block; }
+.ctx-swap .sw.out { animation: swapOut 0.45s cubic-bezier(0.5, 0, 0.75, 0) forwards; }
+.ctx-swap .sw.in  { animation: swapIn 0.6s cubic-bezier(0.2, 0.9, 0.25, 1); }
+@keyframes swapOut {
+  to { opacity: 0; transform: translateY(-40px) rotateX(70deg); filter: blur(10px); }
+}
+@keyframes swapIn {
+  from { opacity: 0; transform: translateY(46px) rotateX(-70deg); filter: blur(10px); }
+}
+.ctx-part {
+  color: var(--ink-dim);
+  opacity: 0; transform: translateY(18px) scale(0.96); filter: blur(8px);
+  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.9, 0.25, 1), filter 0.7s ease, color 0.7s ease;
+}
+.ctx-part.on { opacity: 1; transform: none; filter: blur(0); }
+
+/* "펭귄" — 절대 안 움직이는 단어 */
+.ctx-anchor {
+  color: var(--gold-hi); position: relative;
+  padding: 0 10px;
+  text-shadow: 0 0 44px rgba(255, 210, 122, 0.55);
+}
+.ctx-anchor::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -14px; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  animation: underlinePulse 2.6s ease-in-out infinite;
+}
+@keyframes underlinePulse { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+
+/* 의미 라벨 — 같은 단어가 어떤 의미로 읽히는지 */
+.meaning {
+  margin-top: 34px; font-size: 34px; letter-spacing: 0.06em;
+  color: var(--teal); min-height: 52px;
+  opacity: 0; transform: translateY(14px);
+  transition: opacity 0.6s ease 0.35s, transform 0.6s ease 0.35s;
+}
+.meaning.on { opacity: 1; transform: none; }
+.meaning b { color: var(--gold); font-weight: 400; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   문장 조립기 — 슬라이드 안에서 진짜로 돌아가는 전투
+   ═══════════════════════════════════════════════════════════════════════════ */
+.assembler { width: 100%; max-width: 1560px; display: flex; flex-direction: column; gap: 30px; }
+
+/* 완성 중인 문장 */
+.sentence-line {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  min-height: 130px;
+  background: var(--glass); border-radius: 22px;
+  border: 1px solid var(--glass-hi);
+  backdrop-filter: blur(14px);
+  padding: 22px 40px;
+  box-shadow: inset 0 1px 0 rgba(255, 240, 210, 0.08), 0 18px 50px rgba(0, 0, 0, 0.5);
+}
+.slot {
+  min-width: 250px; height: 84px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 42px; color: var(--ink-faint);
+  border-bottom: 2px dashed rgba(205, 187, 152, 0.32);
+  transition: all 0.4s ease;
+}
+.slot.filled {
+  color: var(--gold-hi); border-bottom-color: var(--gold);
+  text-shadow: 0 0 26px rgba(255, 210, 122, 0.5);
+}
+.slot.current {
+  border-bottom-color: var(--teal);
+  box-shadow: 0 6px 24px -12px var(--teal);
+}
+.slot.current::after {
+  content: ''; width: 3px; height: 46px; background: var(--teal);
+  animation: caret 1s steps(2) infinite; margin-left: 6px;
+}
+@keyframes caret { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.slot-tag {
+  position: absolute; margin-top: -104px; font-size: 18px;
+  letter-spacing: 0.24em; color: var(--ink-faint);
+}
+
+/* ── 카드 손패 ── */
+.hand { display: flex; gap: 20px; justify-content: center; }
+.card {
+  width: 246px; padding: 22px 20px 18px;
+  background: linear-gradient(165deg, rgba(42, 30, 46, 0.9), rgba(20, 14, 24, 0.94));
+  border: 1px solid rgba(255, 207, 118, 0.24);
+  border-radius: 16px; cursor: none;
+  display: flex; flex-direction: column; gap: 10px;
+  position: relative; overflow: hidden;
+  transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.25, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+.card::before { /* 포일 — 게임 FoilShader의 정지형 */
+  content: ''; position: absolute; inset: 0; opacity: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 240, 210, 0.22) 46%, transparent 60%);
+  transition: opacity 0.3s ease; pointer-events: none;
+}
+.card:hover {
+  transform: translateY(-16px) scale(1.035);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px rgba(255, 207, 118, 0.35), 0 24px 54px rgba(0, 0, 0, 0.65), 0 0 46px -8px rgba(255, 210, 122, 0.5);
+}
+.card:hover::before { opacity: 1; }
+.card.picked { transform: translateY(-10px); border-color: var(--gold); opacity: 0.35; pointer-events: none; }
+.card.disabled { opacity: 0.22; pointer-events: none; filter: grayscale(0.7); }
+
+.card-text { font-size: 32px; color: var(--ink); }
+.card-note { font-size: 17px; color: var(--gold-deep); line-height: 1.45; }
+.card-lore { font-size: 15px; color: var(--ink-faint); line-height: 1.5; font-style: italic; }
+.card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto; padding-top: 8px; }
+.tag {
+  font-size: 14px; padding: 3px 9px; border-radius: 999px;
+  background: rgba(127, 199, 203, 0.14); color: var(--teal);
+  border: 1px solid rgba(127, 199, 203, 0.26);
+}
+.card[data-rarity='rare']   { border-color: rgba(111, 198, 221, 0.4); }
+.card[data-rarity='rare'] .card-text { color: var(--rare); }
+.card[data-rarity='epic']   { border-color: rgba(199, 155, 240, 0.45); }
+.card[data-rarity='epic'] .card-text { color: var(--epic); }
+.card[data-rarity='epic']::after {
+  content: ''; position: absolute; inset: -40%;
+  background: conic-gradient(from 0deg, transparent, rgba(199, 155, 240, 0.16), transparent 40%);
+  animation: spin 6s linear infinite; pointer-events: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── 결과 패널 ── */
+.result {
+  display: grid; grid-template-columns: 1fr auto; gap: 34px; align-items: center;
+  background: var(--glass-strong); border: 1px solid var(--glass-hi);
+  border-radius: 20px; padding: 30px 40px; backdrop-filter: blur(16px);
+  opacity: 0; transform: translateY(20px); transition: all 0.5s ease;
+  min-height: 210px;
+}
+.result.on { opacity: 1; transform: none; }
+.combo-list { display: flex; flex-direction: column; gap: 12px; }
+.combo {
+  display: flex; align-items: center; gap: 16px;
+  font-size: 30px; color: var(--gold-hi);
+  opacity: 0; transform: translateX(-24px);
+  animation: comboIn 0.5s cubic-bezier(0.2, 0.9, 0.25, 1) forwards;
+  animation-delay: var(--cd, 0s);
+}
+@keyframes comboIn { to { opacity: 1; transform: none; } }
+.combo-badge {
+  padding: 5px 16px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--gold-deep), var(--gold));
+  color: #2a1c10; font-size: 26px;
+}
+.combo-flavor { font-size: 20px; color: var(--ink-faint); font-style: italic; }
+.formula { font-size: 22px; color: var(--ink-dim); line-height: 1.9; }
+.formula em { color: var(--gold); font-style: normal; }
+
+.damage { text-align: right; }
+.damage-label { font-size: 20px; letter-spacing: 0.3em; color: var(--ink-faint); }
+.damage-value {
+  font-size: 130px; line-height: 1; color: var(--gold-hi);
+  text-shadow: 0 0 50px rgba(255, 210, 122, 0.6);
+}
+.damage.crit .damage-value { color: #fff2cf; animation: critShake 0.5s ease; }
+.damage.heal-k .damage-value { color: var(--heal); text-shadow: 0 0 50px rgba(159, 226, 122, 0.55); }
+.damage.guard-k .damage-value { color: var(--rare); text-shadow: 0 0 50px rgba(111, 198, 221, 0.55); }
+@keyframes critShake {
+  0% { transform: scale(1.5); } 40% { transform: scale(0.94); } 100% { transform: scale(1); }
+}
+.crit-mark {
+  display: inline-block; font-size: 26px; color: #fff2cf;
+  border: 1px solid var(--gold); border-radius: 6px; padding: 2px 10px; margin-bottom: 8px;
+}
+
+/* 화면 전체 임팩트 */
+#flash {
+  position: absolute; inset: 0; z-index: 40; pointer-events: none; opacity: 0;
+  background: radial-gradient(circle at 50% 55%, rgba(255, 236, 190, 0.9), rgba(255, 200, 110, 0.25) 40%, transparent 70%);
+}
+#flash.fire { animation: flashOut 0.7s ease-out; }
+@keyframes flashOut { 0% { opacity: 0.95; } 100% { opacity: 0; } }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   그리드 / 카드형 블록
+   ═══════════════════════════════════════════════════════════════════════════ */
+.grid { display: grid; gap: 26px; width: 100%; }
+.g2 { grid-template-columns: repeat(2, 1fr); }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+.g4 { grid-template-columns: repeat(4, 1fr); }
+
+.panel {
+  background: var(--glass); border: 1px solid var(--glass-hi);
+  border-radius: 18px; padding: 34px 32px; backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 240, 210, 0.07), 0 16px 40px rgba(0, 0, 0, 0.45);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.panel h3 { font-size: 34px; font-weight: 400; color: var(--gold); }
+.panel p { font-size: 22px; color: var(--ink-dim); line-height: 1.65; }
+.panel .kicker { font-size: 18px; letter-spacing: 0.24em; color: var(--ink-faint); }
+
+/* 관용구 34종 그리드 */
+.combo-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; width: 100%; }
+.combo-chip {
+  padding: 14px 12px; border-radius: 12px; text-align: center;
+  background: rgba(26, 18, 30, 0.6); border: 1px solid rgba(255, 207, 118, 0.16);
+  font-size: 19px; color: var(--ink-dim);
+  transition: all 0.3s ease;
+}
+.combo-chip .cm { display: block; font-size: 16px; color: var(--gold-deep); margin-top: 4px; }
+.combo-chip.hot {
+  border-color: var(--gold); color: var(--gold-hi);
+  box-shadow: 0 0 26px -6px rgba(255, 210, 122, 0.6);
+  transform: scale(1.06);
+}
+
+/* 벌레 행렬 — 저마다 다른 박자로 스멀거린다 */
+.bug-row { display: flex; gap: 30px; align-items: flex-end; margin-top: 52px; }
+.bug-row img {
+  width: 128px; height: 128px; object-fit: contain;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.6));
+  animation: bugIdle var(--bd, 3s) ease-in-out infinite;
+}
+.bug-row img:nth-child(2n)  { --bd: 3.6s; width: 112px; }
+.bug-row img:nth-child(3n)  { --bd: 4.2s; }
+.bug-row img:nth-child(n+5) { width: 158px; } /* 보스는 크게 */
+@keyframes bugIdle {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-12px) rotate(2deg); }
+}
+
+/* 스탯 타일 */
+.stat-tile { text-align: center; display: flex; flex-direction: column; gap: 8px; }
+.stat-tile .v { font-size: 74px; color: var(--gold-hi); line-height: 1; }
+.stat-tile .l { font-size: 21px; color: var(--ink-faint); letter-spacing: 0.1em; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   AI 파이프라인
+   ═══════════════════════════════════════════════════════════════════════════ */
+.pipeline { display: flex; align-items: stretch; gap: 0; width: 100%; }
+.pipe-node {
+  flex: 1; padding: 28px 22px; text-align: center;
+  background: var(--glass); border: 1px solid var(--glass-hi);
+  border-radius: 16px; position: relative;
+  display: flex; flex-direction: column; gap: 10px; justify-content: center;
+}
+.pipe-node + .pipe-node { margin-left: 26px; }
+.pipe-node + .pipe-node::before {
+  content: '→'; position: absolute; left: -22px; top: 50%; transform: translateY(-50%);
+  color: var(--gold-deep); font-size: 26px;
+}
+.pipe-node .n { font-size: 27px; color: var(--gold); }
+.pipe-node .d { font-size: 18px; color: var(--ink-faint); line-height: 1.5; }
+
+/* 코드 블록 — AGENTS.md 인용 */
+.code {
+  background: rgba(10, 7, 12, 0.82); border: 1px solid rgba(255, 207, 118, 0.18);
+  border-radius: 14px; padding: 26px 30px;
+  font-family: 'SF Mono', 'Consolas', ui-monospace, monospace;
+  font-size: 20px; line-height: 1.85; color: var(--ink-dim);
+  text-align: left; white-space: pre-wrap;
+}
+.code .c { color: var(--ink-faint); }
+.code .k { color: var(--gold); }
+.code .s { color: var(--teal); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   영상
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cine {
+  position: absolute; inset: 0; z-index: -1;
+  width: 100%; height: 100%; object-fit: cover;
+  opacity: 0; transition: opacity 1.4s ease;
+}
+.slide.active .cine { opacity: var(--cine-opacity, 0.45); }
+
+/* 영상 위 글자가 반드시 읽히도록 중앙을 눌러 주는 비네트 */
+.cine-veil {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(ellipse 62% 58% at 50% 50%, rgba(6, 5, 9, 0.82) 0%, rgba(6, 5, 9, 0.34) 55%, transparent 78%),
+    linear-gradient(180deg, rgba(6, 5, 9, 0.6) 0%, transparent 22%, transparent 72%, rgba(6, 5, 9, 0.85) 100%);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   발표 전체를 관통하는 문장 바 — 이 덱 자체가 한 문장이다
+   ═══════════════════════════════════════════════════════════════════════════ */
+#meta-sentence {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 132px; z-index: 20;
+  display: flex; align-items: center; justify-content: center; gap: 26px;
+  background: linear-gradient(0deg, rgba(6, 5, 9, 0.94) 20%, rgba(6, 5, 9, 0) 100%);
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+#meta-sentence.hidden { opacity: 0; }
+.ms-slot {
+  min-width: 210px; padding: 10px 22px 14px; text-align: center;
+  font-size: 34px; color: rgba(154, 139, 114, 0.42);
+  border-bottom: 2px solid rgba(154, 139, 114, 0.18);
+  transition: all 0.7s cubic-bezier(0.2, 0.9, 0.25, 1);
+  position: relative;
+}
+.ms-slot .ms-role {
+  display: block; font-size: 15px; letter-spacing: 0.28em;
+  color: rgba(154, 139, 114, 0.5); margin-bottom: 4px;
+}
+.ms-slot.on {
+  color: var(--gold-hi); border-bottom-color: var(--gold);
+  text-shadow: 0 0 30px rgba(255, 210, 122, 0.55);
+}
+.ms-slot.on .ms-role { color: var(--gold-deep); }
+.ms-slot.just-won { animation: slotWin 1s cubic-bezier(0.2, 0.9, 0.25, 1); }
+@keyframes slotWin {
+  0% { transform: translateY(26px) scale(1.35); filter: blur(10px); opacity: 0; }
+  100% { transform: none; filter: blur(0); opacity: 1; }
+}
+#meta-sentence.complete .ms-slot { animation: slotFire 1.2s ease; }
+@keyframes slotFire {
+  0%, 100% { transform: none; }
+  30% { transform: translateY(-16px) scale(1.12); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   토큰 — 게임의 마스코트 요정. 게임에서 맡은 역할을 그대로 가져왔다.
+   AGENTS.md: "보스 패턴의 경고와 파훼 방법은 좌측 토큰의 말풍선으로 전한다."
+   여기서는 관객에게 같은 방식으로 말을 건다.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#token-stage {
+  position: absolute; left: 66px; bottom: 152px; z-index: 22;
+  width: 500px; pointer-events: none;
+  transition: transform 1s cubic-bezier(0.2, 0.9, 0.25, 1), opacity 0.6s ease;
+}
+#token-stage.hidden { opacity: 0; transform: translateY(40px); }
+
+/* 무대 중앙으로 날아오는 피날레 */
+#token-stage.center {
+  left: 50%; bottom: 140px;
+  transform: translateX(-105px) scale(1.5);
+  transform-origin: 105px bottom;
+}
+/* 가운데로 날아왔을 때는 말풍선을 머리 위로 올린다 — 본문을 가리지 않도록 */
+#token-stage.center #token-bubble {
+  left: 50%; margin-left: -150px; width: 300px; min-width: 0; bottom: 232px;
+  text-align: center; border-radius: 20px; font-size: 30px;
+}
+#token-stage.center #token-bubble::after {
+  left: 50%; margin-left: -9px; bottom: -10px;
+  transform: rotate(-45deg); border-radius: 0 0 0 5px;
+}
+
+#token-wrap { position: relative; width: 210px; height: 210px; }
+
+#token {
+  width: 210px; height: 210px; object-fit: contain;
+  animation: tokenFloat 3.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 26px rgba(255, 210, 122, 0.5)) drop-shadow(0 12px 22px rgba(0, 0, 0, 0.5));
+  transition: opacity 0.3s ease;
+}
+@keyframes tokenFloat {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50%      { transform: translateY(-18px) rotate(1.5deg); }
+}
+/* 날갯짓 — 말할 때 빨라진다 */
+#token-stage.talking #token { animation-duration: 1.5s; }
+
+/* 토큰이 흩뿌리는 빛가루 */
+#token-dust { position: absolute; inset: -30px; pointer-events: none; }
+#token-dust i {
+  position: absolute; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--glow); left: var(--x); top: var(--y);
+  box-shadow: 0 0 8px 2px rgba(255, 210, 122, 0.8);
+  animation: dust var(--dur) ease-in-out infinite;
+  animation-delay: var(--dd);
+}
+@keyframes dust {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.4); }
+  40%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), -46px) scale(1); }
+}
+
+/* ── 말풍선 — 게임의 손글씨 팝업 ── */
+#token-bubble {
+  position: absolute; left: 224px; bottom: 96px;
+  min-width: 300px; max-width: 660px;
+  padding: 22px 30px;
+  background: var(--glass-strong); backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 207, 118, 0.4);
+  border-radius: 20px 20px 20px 4px;
+  font-size: 26px; line-height: 1.55; color: var(--ink);
+  box-shadow: 0 0 40px -10px rgba(255, 210, 122, 0.4), 0 16px 40px rgba(0, 0, 0, 0.55);
+  opacity: 0; transform: translateY(14px) scale(0.94); transform-origin: 0 100%;
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+#token-bubble.on { opacity: 1; transform: none; }
+#token-bubble::after { /* 꼬리 */
+  content: ''; position: absolute; left: -9px; bottom: 0;
+  width: 18px; height: 18px;
+  background: var(--glass-strong);
+  border-left: 1px solid rgba(255, 207, 118, 0.4);
+  border-bottom: 1px solid rgba(255, 207, 118, 0.4);
+  border-radius: 0 0 0 5px;
+}
+#token-bubble b { color: var(--gold-hi); font-weight: 400; }
+#token-bubble .tk { color: var(--teal); }
+
+/* 경고 — 게임에선 붉은 쪽지가 된다 */
+#token-bubble.warn {
+  border-color: rgba(255, 138, 106, 0.6); color: #ffd9cc;
+  box-shadow: 0 0 46px -10px rgba(255, 138, 106, 0.5), 0 16px 40px rgba(0, 0, 0, 0.55);
+}
+#token-bubble.warn::after { border-color: rgba(255, 138, 106, 0.6); }
+#token-bubble.warn b { color: var(--danger); }
+/* 안도 */
+#token-bubble.relief { border-color: rgba(159, 226, 122, 0.55); }
+#token-bubble.relief::after { border-color: rgba(159, 226, 122, 0.55); }
+#token-bubble.relief b { color: var(--heal); }
+
+/* 한 글자씩 써지는 손글씨 효과 */
+#token-bubble .ch {
+  opacity: 0;
+  animation: writeIn 0.26s ease forwards;
+  animation-delay: var(--cd);
+}
+@keyframes writeIn { to { opacity: 1; } }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   진행 표시 · 발표자 보조
+   ═══════════════════════════════════════════════════════════════════════════ */
+#progress {
+  position: absolute; top: 0; left: 0; height: 3px; z-index: 30;
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold-hi));
+  box-shadow: 0 0 14px rgba(255, 210, 122, 0.7);
+  width: 0; transition: width 0.6s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+#chapter-mark {
+  position: absolute; top: 42px; right: 60px; z-index: 21;
+  font-size: 19px; letter-spacing: 0.3em; color: var(--ink-faint);
+  text-align: right;
+}
+#chapter-mark b { color: var(--gold-deep); font-weight: 400; }
+
+#hint {
+  position: absolute; bottom: 146px; right: 60px; z-index: 21;
+  font-size: 17px; color: rgba(154, 139, 114, 0.5); letter-spacing: 0.1em;
+  transition: opacity 0.5s ease;
+}
+#hint.hidden { opacity: 0; }
+
+/* 연필 커서 — 게임 CustomCursor 이식 */
+#pencil {
+  position: fixed; z-index: 90; pointer-events: none;
+  width: 34px; height: 34px; margin: -3px 0 0 -3px;
+  transition: transform 0.12s ease;
+}
+#pencil.press { transform: scale(0.82) rotate(-8deg); }
+body.no-cursor #pencil { display: none; }
+
+/* 오버뷰 */
+#overview {
+  position: absolute; inset: 0; z-index: 60; display: none;
+  background: rgba(6, 5, 9, 0.95); backdrop-filter: blur(10px);
+  padding: 70px; overflow-y: auto;
+}
+#overview.on { display: block; }
+.ov-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; }
+.ov-item {
+  padding: 20px 18px; border-radius: 12px; cursor: none;
+  background: var(--glass); border: 1px solid var(--glass-hi);
+  font-size: 19px; color: var(--ink-dim); transition: all 0.2s ease;
+}
+.ov-item:hover, .ov-item.cur { border-color: var(--gold); color: var(--gold-hi); }
+.ov-item .n { font-size: 15px; color: var(--ink-faint); display: block; margin-bottom: 6px; }
