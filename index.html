@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#140c14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Little Token · G-STAR 2026 룰렛</title>
+<script src="config.js"></script>
+<style>
+@font-face{font-family:Griun;src:url(assets/Griun_PolFairness-Rg.woff2) format('woff2');font-display:block}
+:root{
+  --gold:#f0c46a; --gold2:#e9b85a; --cream:#fff4dc; --ink:#4a2a12; --line:#5b3a1f;
+  --panel:linear-gradient(180deg,rgba(44,28,36,.84),rgba(22,14,22,.88));
+  --u:min(1vh,0.5625vw); /* 화면 비율에 맞춘 단위 */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#140c14;color:var(--cream);
+  font-family:Griun,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;user-select:none;-webkit-user-select:none;word-break:keep-all;-webkit-tap-highlight-color:transparent}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+#stage{position:fixed;inset:0;overflow:hidden;touch-action:manipulation}
+.bg{position:absolute;inset:-3%;background:url(assets/bg_001.webp) center 62%/cover;filter:saturate(1.05) brightness(.82);animation:bgDrift 40s ease-in-out infinite alternate}
+@keyframes bgDrift{to{transform:scale(1.05) translate(-1%,1%)}}
+.shade{position:absolute;inset:0;background:
+  radial-gradient(ellipse 55% 60% at 50% 52%,rgba(255,214,140,.16),transparent 70%),
+  linear-gradient(180deg,rgba(18,10,22,.62),rgba(18,10,22,.25) 40%,rgba(18,10,22,.55) 80%,rgba(12,6,14,.9));
+  box-shadow:inset 0 0 22vh rgba(8,4,10,.85)}
+.fly{position:absolute;border-radius:50%;background:#ffe9a0;box-shadow:0 0 10px 4px rgba(255,220,120,.65);animation:fly linear infinite}
+@keyframes fly{0%{transform:translate(0,0);opacity:0}15%{opacity:var(--o)}50%{transform:translate(var(--dx),-6vh)}85%{opacity:var(--o)}100%{transform:translate(calc(var(--dx)*-.5),-13vh);opacity:0}}
+
+/* ── 장식 보스들 ── */
+.deco{position:absolute;pointer-events:none;filter:drop-shadow(0 12px 18px rgba(0,0,0,.55))}
+.spider{right:7vw;top:0;width:calc(var(--u)*17);animation:hang 4.5s ease-in-out infinite;transform-origin:50% -40vh}
+.spider::before{content:"";position:absolute;left:50%;bottom:78%;width:2px;height:40vh;background:linear-gradient(rgba(255,255,255,.0),rgba(255,255,255,.55))}
+.spider img{width:100%;display:block}
+@keyframes hang{0%,100%{transform:translateY(-4vh) rotate(-2deg)}50%{transform:translateY(-1vh) rotate(2deg)}}
+.mantis{left:-1.5vw;bottom:-3vh;height:calc(var(--u)*30);transform:rotate(6deg);animation:peek 6s ease-in-out infinite}
+@keyframes peek{0%,100%{transform:rotate(0)}50%{transform:rotate(-4deg)}}
+.bee{right:-1vw;bottom:2vh;height:calc(var(--u)*27);animation:buzz 3.2s ease-in-out infinite}
+@keyframes buzz{0%,100%{transform:translate(0,0) rotate(-3deg)}25%{transform:translate(-4%,-6%) rotate(1deg)}50%{transform:translate(2%,-2%) rotate(3deg)}75%{transform:translate(-2%,-8%) rotate(-1deg)}}
+
+/* ── 레이아웃 ── */
+.layout{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*3.2);padding:calc(var(--u)*4)}
+.panel{position:relative;background:var(--panel);border:1px solid rgba(255,214,140,.24);border-radius:calc(var(--u)*2.6);
+  box-shadow:0 2vh 5vh rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.07);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.side{width:calc(var(--u)*50);padding:calc(var(--u)*3.2) calc(var(--u)*3)}
+.kicker{font-size:calc(var(--u)*2.1);color:var(--gold2);letter-spacing:.18em;text-shadow:0 0 10px rgba(233,184,90,.5)}
+.h1{font-size:calc(var(--u)*4.1);line-height:1.15;color:var(--cream);text-shadow:0 0 16px rgba(255,220,150,.45),0 3px 0 rgba(0,0,0,.45);margin-top:calc(var(--u)*.8)}
+.logo{display:block;width:100%;margin:calc(var(--u)*-2) 0 calc(var(--u)*-1.5);filter:drop-shadow(0 6px 14px rgba(0,0,0,.6))}
+.pill{display:inline-flex;align-items:center;gap:.4em;padding:.2em .8em;border-radius:999px;font-size:calc(var(--u)*1.9);white-space:nowrap;
+  background:#bff0a8;color:#24501a;border:2px solid #7cc45d;box-shadow:0 2px 0 rgba(0,0,0,.35)}
+.pill.red{background:#ff8f7a;color:#5a130a;border-color:#ffbfae}
+.pill.gold{background:#ffd76a;color:#5a3608;border-color:#fff0b8}
+.pill.t-common{background:#e9e1d2;color:#4a3a28;border-color:#fff6e6}
+.pill.t-rare{background:#8fd0ff;color:#0e3a5e;border-color:#d4efff;box-shadow:0 2px 0 rgba(0,0,0,.35),0 0 10px rgba(120,200,255,.6)}
+.pill.t-epic{background:linear-gradient(90deg,#c58bff,#ff9be0);color:#3a0a5e;border-color:#f3dcff;box-shadow:0 2px 0 rgba(0,0,0,.35),0 0 14px rgba(200,130,255,.8);animation:epicGlow 1.6s ease-in-out infinite}
+@keyframes epicGlow{50%{box-shadow:0 2px 0 rgba(0,0,0,.35),0 0 22px rgba(230,150,255,1)}}
+.card.t-epic{border-color:rgba(214,160,255,.6);box-shadow:0 0 18px rgba(190,120,255,.25)}
+.card.t-rare{border-color:rgba(140,205,255,.5)}
+.missions{list-style:none;margin-top:calc(var(--u)*2.4);display:flex;flex-direction:column;gap:calc(var(--u)*1.3)}
+.missions li{display:flex;align-items:center;gap:calc(var(--u)*1.6);padding:calc(var(--u)*1.4) calc(var(--u)*1.8);border-radius:calc(var(--u)*1.6);
+  background:rgba(255,240,210,.06);border:1px solid rgba(255,214,140,.16);font-size:calc(var(--u)*2.6);color:var(--cream)}
+.missions .num{flex:none;width:calc(var(--u)*5);height:calc(var(--u)*5);border-radius:50%;display:grid;place-items:center;font-size:calc(var(--u)*2.5);
+  background:radial-gradient(circle at 35% 30%,#ffe08a,#c98a2c);color:#4a2a08;border:2px solid #fff0b8;box-shadow:0 3px 0 #6b4214}
+.missions .ic{color:#ffb7c5;margin-left:auto;font-size:calc(var(--u)*2.6)}
+.foot{margin-top:calc(var(--u)*2);display:flex;gap:calc(var(--u)*1);align-items:flex-end}
+.pmantis{height:calc(var(--u)*9);margin:calc(var(--u)*-2) calc(var(--u)*-.5) calc(var(--u)*-.8) auto;filter:drop-shadow(0 6px 8px rgba(0,0,0,.5));animation:peek 6s ease-in-out infinite;transform-origin:50% 100%}
+.right .h1,.right .kicker{width:fit-content}
+.pbee{position:absolute;right:calc(var(--u)*2.2);top:calc(var(--u)*1.2);height:calc(var(--u)*11);filter:drop-shadow(0 6px 8px rgba(0,0,0,.5));animation:buzz 3.2s ease-in-out infinite;pointer-events:none}
+#start .sb{position:absolute;bottom:3vh;height:calc(var(--u)*26);z-index:0;pointer-events:none;filter:drop-shadow(0 12px 18px rgba(0,0,0,.6))}
+
+/* ── 룰렛 ── */
+.center{display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*2.2)}
+.wheelbox{position:relative;width:calc(var(--u)*72);height:calc(var(--u)*72);margin-top:calc(var(--u)*4)}
+.wheelbox svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+#glow{position:absolute;inset:-8%;border-radius:50%;background:radial-gradient(circle,rgba(255,210,120,.35),transparent 62%);opacity:.7;transition:opacity .3s}
+#speed{position:absolute;inset:4.5%;border-radius:50%;pointer-events:none;opacity:0;
+  background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.28) 0 1.5deg,transparent 1.5deg 9deg);
+  -webkit-mask:radial-gradient(circle,transparent 26%,#000 44%,#000 92%,transparent 96%);mask:radial-gradient(circle,transparent 26%,#000 44%,#000 92%,transparent 96%)}
+#rot{will-change:transform}
+.bulb{fill:#6b4a22;transition:fill .08s}
+.bulb.on{fill:#fff3b0;filter:url(#bulbGlow)}
+.wheelbox.idle .bulb{animation:blink 1.1s steps(1) infinite}
+.wheelbox.idle .bulb.alt{animation-delay:.55s}
+@keyframes blink{0%{fill:#fff3b0}50%{fill:#6b4a22}}
+.wheelbox.win .bulb{animation:blink .22s steps(1) infinite}
+.wheelbox.win .bulb.alt{animation-delay:.11s}
+.wheelbox.thunk{animation:thunk .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes thunk{0%{transform:scale(1)}30%{transform:scale(1.035)}100%{transform:scale(1)}}
+#pointer{position:absolute;left:50%;top:calc(var(--u)*-5.6);width:calc(var(--u)*11);margin-left:calc(var(--u)*-5.5);transform-origin:50% 22%;z-index:3;filter:drop-shadow(0 6px 6px rgba(0,0,0,.5))}
+#pointer svg{position:static;width:100%;height:auto}
+#pointer.kick{animation:kick .14s ease-out}
+@keyframes kick{0%{transform:rotate(0)}35%{transform:rotate(-17deg)}100%{transform:rotate(0)}}
+#pointer.wobble{animation:wob .9s cubic-bezier(.3,1.8,.5,1)}
+@keyframes wob{0%{transform:rotate(-22deg)}25%{transform:rotate(14deg)}50%{transform:rotate(-8deg)}75%{transform:rotate(4deg)}100%{transform:rotate(0)}}
+#fairy{position:absolute;left:50%;top:50%;width:22%;transform:translate(-50%,-56%);z-index:2;pointer-events:none;animation:bob 2.4s ease-in-out infinite;filter:drop-shadow(0 6px 8px rgba(0,0,0,.45))}
+@keyframes bob{50%{transform:translate(-50%,-62%) rotate(3deg)}}
+.wheelbox.spinning #fairy{animation:dizzy .5s linear infinite}
+@keyframes dizzy{0%{transform:translate(-50%,-56%) rotate(-8deg)}50%{transform:translate(-50%,-60%) rotate(8deg)}100%{transform:translate(-50%,-56%) rotate(-8deg)}}
+
+.btn{position:relative;padding:calc(var(--u)*1.6) calc(var(--u)*7);border-radius:calc(var(--u)*1.8);font-size:calc(var(--u)*4.4);color:#fff8e6;
+  background:linear-gradient(180deg,#d9a24a,#a46a26 60%,#8a5519);border:2px solid var(--gold);
+  box-shadow:0 calc(var(--u)*.8) 0 #5a3610,0 1.4vh 3vh rgba(0,0,0,.5),inset 0 2px 0 rgba(255,240,200,.5);
+  text-shadow:0 2px 0 rgba(70,36,8,.8),0 0 12px rgba(255,220,150,.6);transition:transform .08s,filter .2s}
+.btn:active{transform:translateY(calc(var(--u)*.6));box-shadow:0 calc(var(--u)*.2) 0 #5a3610,0 1vh 2vh rgba(0,0,0,.5),inset 0 2px 0 rgba(255,240,200,.5)}
+.btn:disabled{filter:grayscale(.7) brightness(.7);cursor:default}
+#spinBtn:not(:disabled){animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 calc(var(--u)*.8) 0 #5a3610,0 0 4vh rgba(255,200,90,.75),inset 0 2px 0 rgba(255,240,200,.5)}}
+#status{min-height:calc(var(--u)*4);font-size:calc(var(--u)*3);color:var(--gold);text-shadow:0 0 12px rgba(240,196,106,.6),0 2px 0 rgba(0,0,0,.5);text-align:center}
+#status.shake{animation:tshake .35s linear infinite}
+@keyframes tshake{25%{transform:translate(-2px,1px) rotate(-1deg)}75%{transform:translate(2px,-1px) rotate(1deg)}}
+
+/* 상품 카드 */
+.cards{display:flex;flex-direction:column;gap:calc(var(--u)*1.6);margin-top:calc(var(--u)*2.2)}
+.card{position:relative;display:flex;align-items:center;gap:calc(var(--u)*1.8);padding:calc(var(--u)*1.4) calc(var(--u)*1.8);border-radius:calc(var(--u)*1.8);
+  background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:1.5px solid rgba(255,214,140,.22);overflow:hidden}
+.card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 12% 50%,var(--c),transparent 55%);opacity:.28}
+.card .art{position:relative;flex:none;width:calc(var(--u)*11);height:calc(var(--u)*11);border-radius:calc(var(--u)*1.6);display:grid;place-items:center;
+  background:radial-gradient(circle at 50% 40%,var(--c),var(--d));border:2px solid rgba(255,245,220,.75);box-shadow:inset 0 0 0 3px rgba(0,0,0,.12),0 4px 0 rgba(0,0,0,.35)}
+.card .art svg{width:88%;height:88%;animation:bob2 2.6s ease-in-out infinite}
+.card:nth-child(2) .art svg{animation-delay:-.9s}.card:nth-child(3) .art svg{animation-delay:-1.7s}
+@keyframes bob2{50%{transform:translateY(-6%) rotate(-4deg)}}
+.card .nm{position:relative;font-size:calc(var(--u)*3.6);color:var(--cream);text-shadow:0 2px 0 rgba(0,0,0,.5)}
+.card .ds{position:relative;font-size:calc(var(--u)*1.9);color:#e8d2b0;margin-top:.2em}
+.card .meta{position:relative;margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:.4em}
+.card.out>*:not(.art),.card.out .art svg{filter:grayscale(1) brightness(.6)}.card.out .art{background:#555}
+.card.out .meta{display:none}
+.card .art::after{content:attr(data-stamp);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-14deg);font-size:calc(var(--u)*2.6);color:#ff6f57;background:rgba(255,245,235,.92);border:3px solid #ff6f57;padding:0 .35em;border-radius:.3em;white-space:nowrap;display:none}
+.card.out .art::after{display:block}
+.card .txt{position:relative;flex:1;min-width:0}
+
+/* ── 결과 팝업 ── */
+.overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:20}
+.overlay.show{display:flex}
+#result{background:rgba(10,5,12,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+#result .rays{position:absolute;left:50%;top:46%;width:150vmax;height:150vmax;margin:-75vmax 0 0 -75vmax;border-radius:50%;
+  background:repeating-conic-gradient(from 0deg,rgba(255,220,140,.16) 0 7deg,transparent 7deg 18deg);
+  -webkit-mask:radial-gradient(circle,#000 5%,transparent 45%);mask:radial-gradient(circle,#000 5%,transparent 45%);animation:spinR 14s linear infinite}
+#result.t-rare .rays{background:repeating-conic-gradient(from 0deg,rgba(140,210,255,.26) 0 7deg,rgba(255,240,170,.1) 7deg 11deg,transparent 11deg 18deg);animation-duration:9s}
+#result.t-epic .rays{background:repeating-conic-gradient(from 0deg,rgba(210,150,255,.32) 0 6deg,rgba(255,220,120,.18) 6deg 10deg,transparent 10deg 16deg);animation-duration:5s}
+#result.t-rare .rbox .badge{background:linear-gradient(180deg,#d4efff,#6fb8ef);color:#0b2f52;border-color:#f0faff;box-shadow:0 5px 0 #2a6a9c,0 0 30px rgba(120,200,255,.8)}
+#result.t-epic .rbox .badge{background:linear-gradient(90deg,#c58bff,#ff9be0,#ffd76a);color:#3a0a5e;border-color:#fff0ff;box-shadow:0 5px 0 #5e2a8a,0 0 40px rgba(220,140,255,.95)}
+#result.t-epic .rbox{border-color:rgba(220,170,255,.7);box-shadow:0 0 60px rgba(190,120,255,.45),0 2vh 5vh rgba(0,0,0,.5)}
+#result.t-epic .pname{background:linear-gradient(180deg,#fff 5%,#f0c8ff 45%,#c58bff 75%,#ff9be0);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 5px 0 #3a0a5e) drop-shadow(0 0 22px rgba(210,140,255,.8))}
+@keyframes spinR{to{transform:rotate(360deg)}}
+.rbox{position:relative;width:calc(var(--u)*72);padding:calc(var(--u)*4) calc(var(--u)*4) calc(var(--u)*4.4);text-align:center;transform:scale(.4);opacity:0}
+#result.show .rbox{animation:pop .7s cubic-bezier(.2,1.6,.4,1) forwards}
+@keyframes pop{to{transform:scale(1);opacity:1}}
+.rbox .badge{position:absolute;left:50%;top:0;transform:translate(-50%,-50%) rotate(-3deg);font-size:calc(var(--u)*4);padding:.15em 1.1em;border-radius:999px;
+  background:linear-gradient(180deg,#ffe28a,#f0b23e);color:#5a3005;border:3px solid #fff3c4;box-shadow:0 5px 0 #8a5317,0 0 30px rgba(255,210,100,.7);white-space:nowrap}
+.rbox .big{position:relative;width:calc(var(--u)*34);height:calc(var(--u)*34);margin:calc(var(--u)*1.5) auto 0;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle at 50% 42%,var(--c),var(--d) 75%);border:calc(var(--u)*.6) solid #fff3d6;box-shadow:0 0 0 calc(var(--u)*.5) var(--line),0 0 6vh var(--c)}
+.rbox .big svg{width:80%;height:80%;transform:scale(0) rotate(-30deg)}
+#result.show .rbox .big svg{animation:iconIn .8s .35s cubic-bezier(.2,1.8,.4,1) forwards,bob2 2.2s 1.2s ease-in-out infinite}
+@keyframes iconIn{to{transform:scale(1) rotate(0)}}
+.rbox .sparkle{position:absolute;color:#fff6c8;font-size:calc(var(--u)*4);text-shadow:0 0 12px #ffe18a;animation:tw 1.2s ease-in-out infinite}
+@keyframes tw{50%{transform:scale(.5) rotate(40deg);opacity:.4}}
+.rbox .pname{font-size:calc(var(--u)*9);line-height:1.1;margin-top:calc(var(--u)*2.2);
+  background:linear-gradient(180deg,#fffbe8 10%,#ffd45a 60%,#ff9b2f);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 5px 0 #4a2208) drop-shadow(0 0 18px rgba(255,170,60,.5))}
+.rbox .pdesc{font-size:calc(var(--u)*3);color:var(--cream);margin-top:calc(var(--u)*1)}
+.rbox .hint{font-size:calc(var(--u)*2.1);color:#d9bf98;margin:calc(var(--u)*1.6) 0 calc(var(--u)*2.6)}
+#result .rbox .btn{opacity:0;animation:fadeIn .4s 1.1s forwards}
+@keyframes fadeIn{to{opacity:1}}
+
+/* ── 시작 화면 ── */
+#start{background:radial-gradient(ellipse at 50% 45%,rgba(30,16,24,.88),rgba(10,5,12,.97));flex-direction:column;gap:calc(var(--u)*2.4);text-align:center}
+#start img:not(.sb){width:calc(var(--u)*70);filter:drop-shadow(0 10px 30px rgba(0,0,0,.7));animation:bob3 3s ease-in-out infinite}
+@keyframes bob3{50%{transform:translateY(-1.2vh)}}
+#start .t{font-size:calc(var(--u)*5);text-shadow:0 0 18px rgba(255,220,150,.5),0 3px 0 rgba(0,0,0,.5)}
+#start .s{font-size:calc(var(--u)*2.2);color:#cdb38e}
+#start>*:not(.sb){position:relative;z-index:1}
+
+/* ── 설정 패널 ── */
+.corner{position:fixed;top:calc(var(--u)*1.6);z-index:30;width:calc(var(--u)*5.2);height:calc(var(--u)*5.2);border-radius:50%;display:grid;place-items:center;
+  font-size:calc(var(--u)*2.8);color:#f0d9b0;background:rgba(30,18,26,.55);border:1px solid rgba(255,214,140,.25);opacity:.35;transition:opacity .2s}
+.corner:hover{opacity:1}
+#gear{right:calc(var(--u)*1.6)} #fsBtn{right:calc(var(--u)*8)}
+#admin{background:rgba(8,4,10,.6);z-index:40}
+#admin .panel{width:min(92vw,820px);max-height:92vh;overflow:auto;padding:26px 28px;font-size:18px}
+#admin h2{font-weight:normal;font-size:28px;margin:4px 0 16px;color:var(--cream)}
+#admin table{width:100%;border-collapse:collapse;margin-bottom:14px}
+#admin th{font-weight:normal;color:var(--gold2);font-size:15px;text-align:left;padding:6px 8px;border-bottom:1px solid rgba(255,214,140,.2)}
+#admin td{padding:8px;border-bottom:1px solid rgba(255,255,255,.06)}
+#admin input[type=number],#admin input[type=text]{width:90px;font:inherit;font-size:18px;padding:5px 8px;border-radius:8px;border:1px solid rgba(255,214,140,.35);background:rgba(0,0,0,.35);color:var(--cream)}
+#admin .row{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin:10px 0}
+#admin label{display:flex;gap:8px;align-items:center}
+#admin .sbtn{padding:8px 16px;border-radius:10px;font-size:17px;background:rgba(255,240,210,.1);border:1px solid rgba(255,214,140,.35)}
+#admin .sbtn.main{background:linear-gradient(180deg,#d9a24a,#9c6624);border-color:var(--gold)}
+#admin .note{font-size:14px;color:#bfa580;line-height:1.5}
+#simOut{font-size:15px;color:#e8d2b0;min-height:1.4em}
+
+canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:25}
+#stage.shakeit{animation:sshake .5s cubic-bezier(.36,.07,.19,.97)}
+@keyframes sshake{10%,90%{transform:translate(-2px,1px)}20%,80%{transform:translate(4px,-2px)}30%,50%,70%{transform:translate(-7px,3px)}40%,60%{transform:translate(7px,-3px)}}
+#flash{position:fixed;inset:0;background:#fff6dc;opacity:0;pointer-events:none;z-index:24}
+#flash.go{animation:flash .5s ease-out}
+@keyframes flash{0%{opacity:.75}100%{opacity:0}}
+
+/* 세로 화면(태블릿 세로 등) */
+@media (max-aspect-ratio: 1/1){
+  :root{--u:min(.5vh,.9vw)}
+  .layout{flex-direction:column;gap:calc(var(--u)*2.4)}
+  .side{width:calc(var(--u)*100);padding:calc(var(--u)*2.4)}
+  .left .logo{width:40%;margin:calc(var(--u)*-3) auto calc(var(--u)*-2)}
+  .spider,.pbee,.pmantis{display:none}
+  .left .logo,.right .kicker,.right .h1{display:none}.cards{margin-top:0}
+  .card .ds{display:none}.card .art{width:calc(var(--u)*9);height:calc(var(--u)*9)}
+  .wheelbox{width:calc(var(--u)*86);height:calc(var(--u)*86)}
+  .missions{flex-direction:row;flex-wrap:wrap}.missions li{flex:1 1 40%;font-size:calc(var(--u)*2.4)}
+  .cards{flex-direction:row}.card{flex:1;flex-direction:column;text-align:center}.card .meta{margin:0;align-items:center}
+}
+/* 휴대폰 세로 */
+@media (max-aspect-ratio: 1/1) and (max-width: 600px){
+  :root{--u:min(.55vh,1.02vw)}
+  .layout{gap:calc(var(--u)*2);padding:calc(var(--u)*8) calc(var(--u)*2.5) calc(var(--u)*2)}
+  .corner{width:calc(var(--u)*5.6);height:calc(var(--u)*5.6)}
+  .side{width:100%;padding:calc(var(--u)*2.2) calc(var(--u)*2.4);border-radius:calc(var(--u)*2.4)}
+  .left .kicker,.foot{display:none}
+  .left .h1{font-size:calc(var(--u)*3.8);margin:0;text-align:center}
+  .missions{margin-top:calc(var(--u)*1.4);gap:calc(var(--u)*1)}
+  .missions li{flex:1 1 30%;flex-direction:column;gap:calc(var(--u)*.8);padding:calc(var(--u)*1.2) calc(var(--u)*.8);font-size:calc(var(--u)*2.5);text-align:center;line-height:1.25}
+  .missions .num{width:calc(var(--u)*4.4);height:calc(var(--u)*4.4);font-size:calc(var(--u)*2.3)}
+  .missions .ic{display:none}
+  .wheelbox{width:calc(var(--u)*88);height:calc(var(--u)*88);margin-top:calc(var(--u)*3)}
+  #status{font-size:calc(var(--u)*3.2);min-height:0}
+  .btn{font-size:calc(var(--u)*4.8);padding:calc(var(--u)*1.6) calc(var(--u)*8)}
+  .card{padding:calc(var(--u)*1.2) calc(var(--u)*.6);gap:calc(var(--u)*.8)}
+  .card .nm{font-size:calc(var(--u)*3.2)}
+  .card .art{width:calc(var(--u)*10);height:calc(var(--u)*10)}
+  .rbox{width:calc(100vw - 32px)}
+  #start img:not(.sb){width:80vw}
+  #start .t{font-size:calc(var(--u)*4.2);padding:0 16px}
+  #start .s{display:none}
+  #start .sb{height:calc(var(--u)*20)}
+}
+@media (hover:none){#start .s{display:none}.corner{opacity:.55}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="bg"></div><div class="shade"></div><div id="flies"></div>
+  <div class="deco spider"><img src="assets/boss_elder_spider.webp" alt=""></div>
+
+  <main class="layout">
+    <section class="panel side left">
+      <img class="logo" src="assets/tt_002.webp" alt="Little Token">
+      <div class="kicker" id="evSub"></div>
+      <div class="h1" id="evTitle"></div>
+      <ul class="missions" id="missions"></ul>
+      <div class="foot"><span class="pill gold">1인 1회 참여</span><span class="pill">인증 후 돌려주세요!</span><img class="pmantis" src="assets/boss_mantis.webp" alt=""></div>
+    </section>
+
+    <section class="center">
+      <div class="wheelbox idle" id="wheelbox">
+        <div id="glow"></div>
+        <svg id="wheel" viewBox="-260 -260 520 520" aria-label="룰렛"></svg>
+        <div id="speed"></div>
+        <img id="fairy" src="assets/token_001.webp" alt="">
+        <div id="pointer"><svg viewBox="0 0 100 120">
+          <defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9a7a"/><stop offset="1" stop-color="#d9452b"/></linearGradient></defs>
+          <path d="M50 116 C38 92 16 70 16 44 a34 34 0 0 1 68 0 c0 26 -22 48 -34 72z" fill="url(#pg)" stroke="#4a2410" stroke-width="5" stroke-linejoin="round"/>
+          <circle cx="50" cy="42" r="17" fill="#fff3d0" stroke="#4a2410" stroke-width="4"/>
+          <path d="M50 30 l3.5 7.5 8 1 -6 5.5 1.6 8 -7.1-4 -7.1 4 1.6-8 -6-5.5 8-1z" fill="#ffc93c" stroke="#8a4a10" stroke-width="1.5"/>
+          <ellipse cx="35" cy="26" rx="8" ry="4" fill="#fff" opacity=".55" transform="rotate(-30 35 26)"/>
+        </svg></div>
+      </div>
+      <div id="status">인증하고 룰렛을 돌려주세요!</div>
+      <button class="btn" id="spinBtn">룰렛 돌리기!</button>
+    </section>
+
+    <section class="panel side right">
+      <img class="pbee" src="assets/boss_queen_bee.webp" alt="">
+      <div class="kicker">오늘의 선물</div>
+      <div class="h1">무엇이 나올까?</div>
+      <div class="cards" id="cards"></div>
+    </section>
+  </main>
+</div>
+
+<div id="flash"></div>
+<canvas id="fx"></canvas>
+
+<div class="overlay" id="result">
+  <div class="rays"></div>
+  <div class="panel rbox" id="rbox">
+    <div class="badge" id="rBadge">당첨!</div>
+    <div class="big" id="rBig"></div>
+    <div class="pname" id="rName"></div>
+    <div class="pdesc" id="rDesc"></div>
+    <div class="hint">스태프에게 이 화면을 보여주세요</div>
+    <button class="btn" id="okBtn">선물 받기 완료</button>
+  </div>
+</div>
+
+<div class="overlay show" id="start">
+  <img src="assets/tt_002.webp" alt="Little Token">
+  <div class="t">G-STAR 2026 · 팔로우/위시 룰렛</div>
+  <button class="btn" id="startBtn">▶ 전체화면으로 시작</button>
+  <img class="sb" src="assets/boss_mantis.webp" style="left:3vw" alt=""><img class="sb" src="assets/boss_queen_bee.webp" style="right:3vw;animation:buzz 3.2s ease-in-out infinite" alt="">
+  <div class="s">스페이스/엔터: 돌리기 · F: 전체화면 · S: 확률·재고 설정</div>
+</div>
+
+<button class="corner" id="fsBtn" title="전체화면 (F)">⛶</button>
+<button class="corner" id="gear" title="설정 (S)">⚙</button>
+
+<div class="overlay" id="admin">
+  <div class="panel">
+    <div class="kicker">STAFF ONLY</div>
+    <h2>확률 · 재고 설정</h2>
+    <table><thead><tr><th>상품</th><th>가중치</th><th>확률</th><th>남은 재고 (비우면 무제한)</th><th>지급</th></tr></thead><tbody id="admRows"></tbody></table>
+    <div class="row">
+      <label>회전 시간 <input type="number" id="optSec" step="0.1" min="2" max="12">초</label>
+    </div>
+    <div class="row">
+      <label><input type="checkbox" id="optOdds"> 상품 카드에 확률 표시</label>
+      <label><input type="checkbox" id="optSnd"> 효과음</label>
+    </div>
+    <div class="row" id="totalLine"></div>
+    <div class="row">
+      <button class="sbtn main" id="admSave">저장하고 닫기</button>
+      <button class="sbtn" id="admSim">확률 테스트 (1만 회)</button>
+      <button class="sbtn" id="admResetCnt">지급 기록 초기화</button>
+      <button class="sbtn" id="admDefault">파일 기본값으로</button>
+      <button class="sbtn" id="admExport">현재 값으로 config.js 만들기</button>
+    </div>
+    <div id="simOut"></div>
+    <p class="note">여기서 바꾼 값은 이 PC 브라우저에 저장되어 껐다 켜도 유지됩니다. 다른 PC에서도 같은 값을 쓰려면 "현재 값으로 config.js 만들기"로 받은 파일을 폴더에 덮어쓰세요. 재고를 숫자로 넣으면 당첨될 때마다 1씩 줄고, 0이 되면 더 이상 당첨되지 않아요. 확률 테스트는 실제 지급 기록에 영향을 주지 않습니다.</p>
+  </div>
+</div>
+
+<script>
+/* =================== 일러스트 (SVG) =================== */
+const L = '#5b3a1f';
+function star(cx,cy,R,r,n=5){let p=[];for(let i=0;i<n*2;i++){const a=Math.PI*i/n-Math.PI/2,rr=i%2?r:R;p.push((cx+rr*Math.cos(a)).toFixed(1)+','+(cy+rr*Math.sin(a)).toFixed(1))}return p.join(' ')}
+const face=(x,y,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})">
+  <ellipse cx="-8" cy="0" rx="2.8" ry="3.6" fill="#4a2a14"/><ellipse cx="8" cy="0" rx="2.8" ry="3.6" fill="#4a2a14"/>
+  <circle cx="-7" cy="-1.3" r="1" fill="#fff"/><circle cx="9" cy="-1.3" r="1" fill="#fff"/>
+  <ellipse cx="-14" cy="6" rx="4.4" ry="2.6" fill="#ff9e94" opacity=".75"/><ellipse cx="14" cy="6" rx="4.4" ry="2.6" fill="#ff9e94" opacity=".75"/>
+  <path d="M-3 6 q3 3.4 6 0" fill="none" stroke="#4a2a14" stroke-width="2" stroke-linecap="round"/></g>`;
+const ICONS = {
+ecobag:`
+  <ellipse cx="60" cy="112" rx="34" ry="5" fill="#000" opacity=".18"/>
+  <path d="M41 48 C40 16 80 16 79 48" fill="none" stroke="${L}" stroke-width="9" stroke-linecap="round"/>
+  <path d="M41 48 C40 16 80 16 79 48" fill="none" stroke="#e8cf9c" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M24 44 h72 l6 56 q1 9 -8 9 H26 q-9 0 -8 -9 Z" fill="#f8ecd2" stroke="${L}" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M25 52 h70" stroke="#e2c99a" stroke-width="3" stroke-dasharray="4 4"/>
+  <path d="M60 74 v-13" stroke="#4d7a2e" stroke-width="3" stroke-linecap="round"/>
+  <path d="M60 63 q-13 -1 -15 -12 q12 -1 15 12z" fill="#9fd36b" stroke="#4d7a2e" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M60 63 q13 -1 15 -12 q-12 -1 -15 12z" fill="#b9e58a" stroke="#4d7a2e" stroke-width="2.4" stroke-linejoin="round"/>
+  ${face(60,88,1)}
+  <path d="M30 98 q4 -3 8 0" stroke="#e2c99a" stroke-width="2" fill="none"/>`,
+keyring:`
+  <circle cx="60" cy="18" r="12" fill="none" stroke="#7d828c" stroke-width="5.5"/>
+  <circle cx="60" cy="18" r="12" fill="none" stroke="#eef2f7" stroke-width="2"/>
+  <ellipse cx="60" cy="35" rx="4" ry="6" fill="none" stroke="#7d828c" stroke-width="3.2"/>
+  <rect x="22" y="40" width="76" height="72" rx="26" fill="#ffffff" fill-opacity=".92" stroke="${L}" stroke-width="3.5"/>
+  <circle cx="60" cy="45" r="3.4" fill="#fff" stroke="${L}" stroke-width="2.2"/>
+  <g stroke="#c9a24a" stroke-width="2.2" fill="#fff6c2">
+   <ellipse cx="38" cy="68" rx="15" ry="10" transform="rotate(-28 38 68)"/><ellipse cx="82" cy="68" rx="15" ry="10" transform="rotate(28 82 68)"/>
+   <ellipse cx="41" cy="90" rx="10" ry="7" transform="rotate(25 41 90)"/><ellipse cx="79" cy="90" rx="10" ry="7" transform="rotate(-25 79 90)"/></g>
+  <path d="M54 62 q-3 -7 -8 -9 M66 62 q3 -7 8 -9" stroke="#8a6a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <circle cx="46" cy="53" r="3" fill="#ffe27a" stroke="#8a6a2a" stroke-width="1.4"/><circle cx="74" cy="53" r="3" fill="#ffe27a" stroke="#8a6a2a" stroke-width="1.4"/>
+  <circle cx="60" cy="80" r="19" fill="#fff1b8" stroke="${L}" stroke-width="3"/>
+  <path d="M54 63 q5 -6 10 0" fill="#fff1b8" stroke="${L}" stroke-width="2.4"/>
+  ${face(60,81,.82)}
+  <path d="M92 44 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" fill="#ffe27a"/>`,
+sticker:`
+  <g transform="rotate(12 84 42)">
+   <rect x="58" y="10" width="52" height="58" rx="10" fill="#000" opacity=".18" transform="translate(2 3)"/>
+   <rect x="58" y="10" width="52" height="58" rx="10" fill="#fffdf6" stroke="${L}" stroke-width="3"/>
+   <rect x="62" y="14" width="44" height="50" rx="7" fill="#dff0ff"/>
+   <image href="assets/boss_elder_spider.webp" x="60" y="13" width="48" height="52" preserveAspectRatio="xMidYMid meet"/>
+  </g>
+  <g transform="rotate(-8 48 70)">
+   <path d="M22 30 h56 a10 10 0 0 1 10 10 v50 l-20 20 h-46 a10 10 0 0 1 -10 -10 v-60 a10 10 0 0 1 10 -10z" fill="#000" opacity=".2" transform="translate(3 4)"/>
+   <path d="M22 30 h56 a10 10 0 0 1 10 10 v50 l-20 20 h-46 a10 10 0 0 1 -10 -10 v-60 a10 10 0 0 1 10 -10z" fill="#fffdf6" stroke="${L}" stroke-width="3.5" stroke-linejoin="round"/>
+   <path d="M24 35 h52 a7 7 0 0 1 7 7 v46 l-17 17 h-42 a7 7 0 0 1 -7 -7 v-56 a7 7 0 0 1 7 -7z" fill="#ffe1ea"/>
+   <image href="assets/boss_mantis.webp" x="17" y="33" width="66" height="74" preserveAspectRatio="xMidYMid meet"/>
+   <path d="M88 90 l-20 20 q4 -13 -1 -19 q10 3 21 -1z" fill="#ffd9e3" stroke="${L}" stroke-width="3" stroke-linejoin="round"/>
+   <path d="M20 26 l2.5 5.5 5.5 2.5 -5.5 2.5 -2.5 5.5 -2.5 -5.5 -5.5 -2.5 5.5 -2.5z" fill="#ffe27a" stroke="${L}" stroke-width="1.2"/>
+  </g>`
+};
+const TIER={
+  common:{label:'일반',tag:'',badge:'당첨!'},
+  rare:{label:'레어',tag:'★ RARE ★',badge:'★ 레어 당첨! ★'},
+  epic:{label:'에픽',tag:'✦ EPIC ✦',badge:'✦ 에픽 당첨! ✦'}};
+const LV=p=>({common:0,rare:1,epic:2})[p.tier]||0;
+const iconSVG=(id,cls='')=>`<svg class="${cls}" viewBox="0 0 120 120">${ICONS[id]||''}</svg>`;
+
+/* =================== 설정 / 저장 =================== */
+const BASE = window.ROULETTE_CONFIG;
+const KEY = 'littletoken-gstar2026-roulette';
+let S; // 현재 상태
+function freshState(){return{
+  prizes:Object.fromEntries(BASE.prizes.map(p=>[p.id,{weight:p.weight,stock:p.stock}])),
+  given:Object.fromEntries(BASE.prizes.map(p=>[p.id,0])),
+  opts:{spinSeconds:BASE.spinSeconds,showOdds:BASE.showOdds,sound:BASE.sound}}}
+function load(){
+  S=freshState();
+  try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);
+    for(const p of BASE.prizes){if(d.prizes&&d.prizes[p.id])Object.assign(S.prizes[p.id],d.prizes[p.id]);if(d.given&&d.given[p.id]!=null)S.given[p.id]=d.given[p.id]}
+    if(d.opts)Object.assign(S.opts,d.opts)}}catch(e){}
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+load();
+const P = id=>BASE.prizes.find(p=>p.id===id);
+const avail = ()=>BASE.prizes.filter(p=>S.prizes[p.id].weight>0&&(S.prizes[p.id].stock==null||S.prizes[p.id].stock>0));
+function pickPrize(list=avail()){const tot=list.reduce((a,p)=>a+S.prizes[p.id].weight,0);let r=Math.random()*tot;for(const p of list){r-=S.prizes[p.id].weight;if(r<0)return p}return list[list.length-1]}
+
+/* 룰렛 칸 */
+let SLOTS=(BASE.wheel||[]).filter(id=>P(id));
+for(const p of BASE.prizes)if(!SLOTS.includes(p.id))SLOTS.push(p.id);
+const N=SLOTS.length, SEG=360/N;
+
+/* =================== 화면 구성 =================== */
+document.getElementById('evTitle').textContent=BASE.eventTitle;
+document.getElementById('evSub').textContent=BASE.eventSub;
+document.getElementById('missions').innerHTML=BASE.missions.map((m,i)=>`<li><span class="num">${i+1}</span>${m.text}<span class="ic">${m.icon||''}</span></li>`).join('');
+
+function renderCards(){
+  const tot=avail().reduce((a,p)=>a+S.prizes[p.id].weight,0)||1;
+  document.getElementById('cards').innerHTML=BASE.prizes.map(p=>{
+    const st=S.prizes[p.id],out=!(st.stock==null||st.stock>0)||st.weight<=0;
+    const pct=out?0:S.prizes[p.id].weight/tot*100;
+    const T=TIER[p.tier]||TIER.common;
+    return `<div class="card t-${p.tier||'common'} ${out?'out':''}" style="--c:${p.color};--d:${p.deep}">
+      <div class="art" data-stamp="${st.weight<=0?'제외':'소진'}">${iconSVG(p.id)}</div>
+      <div class="txt"><div class="nm">${p.name}</div><div class="ds">${p.desc}</div></div>
+      <div class="meta"><span class="pill t-${p.tier||'common'}">${T.label}</span>${S.opts.showOdds&&!out?`<span class="pill gold">${pct.toFixed(pct<10?1:0)}%</span>`:''}</div></div>`}).join('');
+}
+
+const wheel=document.getElementById('wheel');
+function pt(r,deg){const a=deg*Math.PI/180;return[(r*Math.sin(a)).toFixed(2),(-r*Math.cos(a)).toFixed(2)]}
+function buildWheel(){
+  const R=228;let defs=`<defs>
+    <filter id="bulbGlow" x="-2" y="-2" width="5" height="5"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <radialGradient id="sliceShade"><stop offset=".25" stop-color="#fff" stop-opacity=".25"/><stop offset=".7" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#3a1a08" stop-opacity=".35"/></radialGradient>
+    <linearGradient id="rimG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe7a0"/><stop offset=".35" stop-color="#d79a3c"/><stop offset=".7" stop-color="#8e5516"/><stop offset="1" stop-color="#e2ac52"/></linearGradient>
+    <radialGradient id="hubG" cx=".4" cy=".35"><stop offset="0" stop-color="#6e4630"/><stop offset="1" stop-color="#2a1620"/></radialGradient>
+    <pattern id="pat-sticker" width="26" height="26" patternUnits="userSpaceOnUse"><circle cx="6" cy="6" r="3.2" fill="#fff" opacity=".55"/><circle cx="19" cy="19" r="2.2" fill="#fff" opacity=".4"/></pattern>
+    <pattern id="pat-keyring" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="8" height="22" fill="#fff" opacity=".28"/></pattern>
+    <pattern id="pat-ecobag" width="34" height="34" patternUnits="userSpaceOnUse"><path d="M9 14 q-6 -1 -7 -7 q6 0 7 7z M9 14 q6 -1 7 -7 q-6 0 -7 7z" fill="#fff" opacity=".45"/><circle cx="26" cy="27" r="2" fill="#fff" opacity=".45"/></pattern>
+    <pattern id="pat-out" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="7" height="14" fill="#000" opacity=".35"/></pattern>
+  </defs>`;
+  let g='';
+  SLOTS.forEach((id,i)=>{
+    const p=P(id),a0=i*SEG,a1=(i+1)*SEG,[x0,y0]=pt(R,a0),[x1,y1]=pt(R,a1),large=SEG>180?1:0;
+    const d=`M0 0 L${x0} ${y0} A${R} ${R} 0 ${large} 1 ${x1} ${y1}Z`,c=a0+SEG/2;
+    const st=S.prizes[id],out=!(st.stock==null||st.stock>0)||st.weight<=0;
+    g+=`<path d="${d}" fill="${p.color}"/><path d="${d}" fill="url(#pat-${id})"/>${out?`<path d="${d}" fill="url(#pat-out)"/>`:''}
+      <g transform="rotate(${c})">
+        <g transform="translate(0 -138)"><svg x="-44" y="-44" width="88" height="88" viewBox="0 0 120 120">${ICONS[id]}</svg></g>
+        <text y="-78" text-anchor="middle" font-size="22" fill="#3d200c" stroke="#fff8ea" stroke-width="5" paint-order="stroke" style="font-family:Griun">${out?(st.weight<=0?'제외':'소진'):p.name}</text>
+        ${(TIER[p.tier]||{}).tag?`<text y="-192" text-anchor="middle" font-size="14" fill="#fff" stroke="${p.deep}" stroke-width="4" paint-order="stroke" style="font-family:Griun">${TIER[p.tier].tag}</text>`:''}
+      </g>`;
+  });
+  // 칸 구분선
+  let lines='';for(let i=0;i<N;i++){const[x,y]=pt(R,i*SEG);lines+=`<line x1="0" y1="0" x2="${x}" y2="${y}" stroke="#5b3a1f" stroke-width="4"/><circle cx="${pt(R-10,i*SEG)[0]}" cy="${pt(R-10,i*SEG)[1]}" r="5" fill="#ffe7a0" stroke="#5b3a1f" stroke-width="2"/>`}
+  let bulbs='';const NB=28;for(let i=0;i<NB;i++){const[x,y]=pt(244,i*360/NB+360/NB/2);bulbs+=`<circle class="bulb ${i%2?'alt':''}" cx="${x}" cy="${y}" r="6.5" stroke="#4a2a0c" stroke-width="2"/>`}
+  wheel.innerHTML=defs+
+   `<circle r="257" fill="#2c1810"/><circle r="252" fill="url(#rimG)" stroke="#4a2a0c" stroke-width="3"/><circle r="236" fill="#3a2010"/>
+    <g id="rot">${g}<circle r="${R}" fill="url(#sliceShade)"/>${lines}
+     <circle r="${R}" fill="none" stroke="#5b3a1f" stroke-width="5"/></g>
+    <g id="bulbs">${bulbs}</g>
+    <circle r="62" fill="url(#hubG)" stroke="url(#rimG)" stroke-width="9"/><circle r="62" fill="none" stroke="#4a2a0c" stroke-width="2"/>`;
+  rotG=document.getElementById('rot');bulbEls=[...wheel.querySelectorAll('.bulb')];setRot(rot);
+}
+let rot=0,rotG,bulbEls;
+function setRot(r){rot=r;if(rotG)rotG.setAttribute('transform',`rotate(${r})`)}
+
+/* 반딧불 */
+(function(){const f=document.getElementById('flies');for(let i=0;i<46;i++){const d=document.createElement('div');d.className='fly';const z=3+Math.random()*7;
+  Object.assign(d.style,{left:Math.random()*100+'vw',top:(15+Math.random()*85)+'vh',width:z+'px',height:z+'px',animationDuration:(7+Math.random()*9)+'s',animationDelay:(-Math.random()*16)+'s'});
+  d.style.setProperty('--o',(.35+Math.random()*.6).toFixed(2));d.style.setProperty('--dx',(Math.random()*8-4)+'vw');f.appendChild(d)}})();
+
+/* =================== 사운드 =================== */
+let AC;function ac(){if(!AC)try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}return AC}
+function tone(f,t=0,dur=.08,type='triangle',vol=.18,slide){if(!S.opts.sound)return;const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain(),s=a.currentTime+t;
+  o.type=type;o.frequency.setValueAtTime(f,s);if(slide)o.frequency.exponentialRampToValueAtTime(slide,s+dur);
+  g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(vol,s+.01);g.gain.exponentialRampToValueAtTime(.001,s+dur);o.connect(g).connect(a.destination);o.start(s);o.stop(s+dur+.02)}
+const SFX={
+  tick(){tone(1500+Math.random()*200,0,.045,'square',.06)},
+  windup(){tone(180,0,.38,'sawtooth',.07,520)},
+  launch(){tone(300,0,.25,'triangle',.18,1200)},
+  heart(){tone(90,0,.12,'sine',.35);tone(80,.16,.14,'sine',.3)},
+  stop(){tone(220,0,.15,'square',.12,110)},
+  win(lv){const n=lv>=1?[523,659,784,1047,1319,1568]:[523,659,784,1047];n.forEach((f,i)=>{tone(f,i*.09,.22,'triangle',.18);tone(f*2,i*.09,.12,'sine',.05)});
+    tone(lv>=1?1568:1047,n.length*.09,.6,'triangle',.16);if(lv>=1)[1047,1319,1568,2093].forEach((f,i)=>tone(f,.75+i*.07,.3,'sine',.1));
+    if(lv>=2){[784,988,1175,1568,1976,2349].forEach((f,i)=>tone(f,1.15+i*.06,.35,'triangle',.12));tone(2093,1.6,.9,'sine',.12);tone(2637,1.6,.9,'sine',.08)}}
+};
+
+/* =================== 파티클 =================== */
+const cv=document.getElementById('fx'),cx=cv.getContext('2d');let parts=[],fxRun=false;
+function fitCanvas(){cv.width=innerWidth*devicePixelRatio;cv.height=innerHeight*devicePixelRatio}
+addEventListener('resize',fitCanvas);fitCanvas();
+function burst(x,y,n,colors,spread=1){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=(4+Math.random()*10)*spread;
+  parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-6,g:.32,r:Math.random()*6.28,vr:(Math.random()-.5)*.4,s:6+Math.random()*9,c:colors[i%colors.length],k:i%4,life:1,dec:.006+Math.random()*.008})}runFx()}
+function rain(n,colors){for(let i=0;i<n;i++)parts.push({x:Math.random()*innerWidth,y:-20-Math.random()*innerHeight*.6,vx:(Math.random()-.5)*2,vy:2+Math.random()*3,g:.05,r:Math.random()*6.28,vr:(Math.random()-.5)*.2,s:7+Math.random()*8,c:colors[i%colors.length],k:i%4,life:1,dec:.003});runFx()}
+function runFx(){if(fxRun)return;fxRun=true;requestAnimationFrame(stepFx)}
+function stepFx(){const d=devicePixelRatio;cx.clearRect(0,0,cv.width,cv.height);
+  parts=parts.filter(p=>p.life>0&&p.y<innerHeight+40);
+  for(const p of parts){p.vx*=.99;p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;p.life-=p.dec;
+    cx.save();cx.globalAlpha=Math.min(1,p.life*2);cx.translate(p.x*d,p.y*d);cx.rotate(p.r);cx.fillStyle=p.c;const s=p.s*d;
+    if(p.k===0)cx.fillRect(-s/2,-s/4,s,s/2);
+    else if(p.k===1){cx.beginPath();cx.arc(0,0,s/2.6,0,7);cx.fill()}
+    else if(p.k===2){cx.beginPath();for(let i=0;i<10;i++){const a=Math.PI*i/5,r=i%2?s/4:s/1.7;cx.lineTo(Math.cos(a)*r,Math.sin(a)*r)}cx.fill()}
+    else{cx.beginPath();cx.ellipse(0,0,s/1.6,s/3.4,0,0,7);cx.fill();cx.strokeStyle='rgba(60,90,30,.6)';cx.lineWidth=d;cx.beginPath();cx.moveTo(-s/1.6,0);cx.lineTo(s/1.6,0);cx.stroke()}
+    cx.restore()}
+  if(parts.length)requestAnimationFrame(stepFx);else{fxRun=false;cx.clearRect(0,0,cv.width,cv.height)}}
+
+/* =================== 회전 =================== */
+const box=document.getElementById('wheelbox'),pointer=document.getElementById('pointer'),statusEl=document.getElementById('status'),
+      spinBtn=document.getElementById('spinBtn'),speedEl=document.getElementById('speed'),glow=document.getElementById('glow');
+let busy=false,lastTick=0;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function say(t,shake){statusEl.textContent=t;statusEl.classList.toggle('shake',!!shake)}
+function kick(){pointer.classList.remove('kick');void pointer.offsetWidth;pointer.classList.add('kick')}
+function tween(from,to,ms,ease,onFrame){return new Promise(res=>{const t0=performance.now();let prev=from;
+  (function f(now){const t=Math.min(1,(now-t0)/ms),v=from+(to-from)*ease(t);
+    if(Math.floor(v/SEG)!==Math.floor(prev/SEG)){kick();if(now-lastTick>38){SFX.tick();lastTick=now}}
+    const sp=Math.abs(v-prev);prev=v;setRot(v);onFrame&&onFrame(sp,t);
+    if(t<1)requestAnimationFrame(f);else res()})(t0)})}
+function chase(sp){const ph=Math.floor(performance.now()/(sp>6?40:sp>2?90:180));bulbEls.forEach((b,i)=>b.classList.toggle('on',(i+ph)%4===0||(sp>6&&(i+ph)%4===2)))}
+
+async function spin(){
+  if(busy)return;const list=avail();
+  if(!list.length){say('준비된 선물이 모두 소진됐어요 (스태프 설정 확인)');return}
+  busy=true;spinBtn.disabled=true;ac();
+  const prize=pickPrize(list);
+  const idxs=SLOTS.map((id,i)=>id===prize.id?i:-1).filter(i=>i>=0),i=idxs[Math.floor(Math.random()*idxs.length)];
+  const off=SEG*(.3+Math.random()*.4);                 // 칸 가운데 쪽에 정직하게 멈춤
+  const a=i*SEG+off;                                   // 바늘이 가리킬 룰렛 각도
+  const turns=6+Math.floor(Math.random()*3);
+  let R=Math.ceil(rot/360)*360+turns*360+((360-a)%360+360)%360;
+  box.classList.remove('idle','win');box.classList.add('spinning');bulbEls.forEach(b=>b.classList.remove('on'));
+
+  // 1) 기 모으기 (살짝 뒤로)
+  say('두근두근…');SFX.windup();
+  const start=rot;await tween(start,start-16,420,t=>1-Math.pow(1-t,2),sp=>chase(1));
+  await sleep(90);
+  // 2) 빙글빙글
+  SFX.launch();say('빙글빙글~!');
+  const dur=S.opts.spinSeconds*1000;let phase=0;
+  await tween(rot,R,dur,t=>1-Math.pow(1-t,3),(sp,t)=>{
+    chase(sp);speedEl.style.opacity=Math.min(1,sp/14).toFixed(2);speedEl.style.transform=`rotate(${-rot*.4}deg)`;
+    glow.style.opacity=(.6+Math.min(.4,sp/30)).toFixed(2);
+    if(t>.55&&phase===0){phase=1;say('어디서 멈출까…?')}
+    if(t>.86&&phase===1){phase=2;say('조금만 더…!',true)}});
+  speedEl.style.opacity=0;
+  // 3) 아슬아슬
+  // 4) 멈춤!
+  SFX.stop();pointer.classList.remove('kick');void pointer.offsetWidth;pointer.classList.add('wobble');setTimeout(()=>pointer.classList.remove('wobble'),950);
+  box.classList.remove('spinning');box.classList.add('thunk','win');setTimeout(()=>box.classList.remove('thunk'),500);
+  const stg=document.getElementById('stage');stg.classList.remove('shakeit');void stg.offsetWidth;stg.classList.add('shakeit');
+  const pr=pointer.getBoundingClientRect();burst(pr.left+pr.width/2,pr.bottom,[50,80,120][LV(prize)],[prize.color,prize.deep,'#ffe27a','#fff6dc','#9fd36b']);
+  say(`${prize.name} 당첨!`);
+  // 기록 저장
+  const st=S.prizes[prize.id];if(st.stock!=null)st.stock=Math.max(0,st.stock-1);S.given[prize.id]=(S.given[prize.id]||0)+1;save();
+  await sleep(750);
+  showResult(prize);
+}
+
+function showResult(p){
+  const r=document.getElementById('result');
+  r.classList.remove('t-common','t-rare','t-epic');r.classList.add('t-'+(p.tier||'common'));const lv=LV(p);
+  const b=document.getElementById('rBig');b.style.setProperty('--c',p.color);b.style.setProperty('--d',p.deep);
+  b.innerHTML=iconSVG(p.id)+['✦','✧','✦','✧'].map((s,i)=>`<span class="sparkle" style="left:${[-6,92,-2,96][i]}%;top:${[10,6,78,74][i]}%;animation-delay:${i*.3}s">${s}</span>`).join('');
+  document.getElementById('rBadge').textContent=(TIER[p.tier]||TIER.common).badge;
+  document.getElementById('rName').textContent=p.name;
+  document.getElementById('rDesc').textContent=p.desc;
+  r.classList.add('show');
+  document.getElementById('flash').classList.remove('go');void document.getElementById('flash').offsetWidth;document.getElementById('flash').classList.add('go');
+  SFX.win(lv);
+  const cols=lv>=2?[p.color,p.deep,'#ffd76a','#ffffff','#ff9be0','#c58bff','#fff3b0']:[p.color,p.deep,'#ffe27a','#ffffff','#ffb7c5','#a8dcff','#c4ea8f'];
+  burst(innerWidth/2,innerHeight*.42,[90,140,200][lv],cols,1.3);rain([110,170,280][lv],cols);
+  if(lv>=2){setTimeout(()=>{burst(innerWidth*.15,innerHeight*.8,90,cols,1.4);burst(innerWidth*.85,innerHeight*.8,90,cols,1.4)},1200)}
+  if(lv>=1){setTimeout(()=>burst(innerWidth*.25,innerHeight*.5,70,cols),450);setTimeout(()=>burst(innerWidth*.75,innerHeight*.5,70,cols),800)}
+}
+function closeResult(){
+  const r=document.getElementById('result');if(!r.classList.contains('show'))return;
+  r.classList.remove('show');box.classList.remove('win');box.classList.add('idle');bulbEls.forEach(b=>b.classList.remove('on'));
+  busy=false;spinBtn.disabled=false;say('인증하고 룰렛을 돌려주세요!');renderCards();buildWheel();
+}
+
+/* =================== 전체화면 =================== */
+function goFull(){const el=document.documentElement;const f=el.requestFullscreen||el.webkitRequestFullscreen;if(f&&!document.fullscreenElement&&!document.webkitFullscreenElement){try{const r=f.call(el);r&&r.catch&&r.catch(()=>{})}catch(e){}}}
+function toggleFull(){if(document.fullscreenElement||document.webkitFullscreenElement){(document.exitFullscreen||document.webkitExitFullscreen).call(document)}else goFull()}
+document.getElementById('startBtn').onclick=()=>{goFull();ac();document.getElementById('start').classList.remove('show')};
+document.getElementById('fsBtn').onclick=toggleFull;
+
+/* =================== 설정 패널 =================== */
+const adm=document.getElementById('admin');
+function openAdmin(){if(busy&&!document.getElementById('result').classList.contains('show'))return;
+  const tb=document.getElementById('admRows');
+  tb.innerHTML=BASE.prizes.map(p=>{const st=S.prizes[p.id];return `<tr data-id="${p.id}"><td><span style="display:inline-flex;align-items:center;gap:8px"><span style="display:inline-block;width:36px;height:36px">${iconSVG(p.id)}</span>${p.name}</span></td>
+    <td><input type="number" min="0" step="1" class="w" value="${st.weight}"></td><td class="pct"></td>
+    <td><input type="text" class="s" placeholder="무제한" value="${st.stock==null?'':st.stock}"></td><td>${S.given[p.id]||0}개</td></tr>`}).join('');
+  document.getElementById('optSec').value=S.opts.spinSeconds;
+  document.getElementById('optOdds').checked=S.opts.showOdds;document.getElementById('optSnd').checked=S.opts.sound;
+  document.getElementById('simOut').textContent='';updPct();tb.oninput=updPct;
+  const tot=Object.values(S.given).reduce((a,b)=>a+b,0);document.getElementById('totalLine').textContent=`지금까지 총 ${tot}회 참여`;
+  adm.classList.add('show')}
+function readAdmin(){const out={};adm.querySelectorAll('#admRows tr').forEach(tr=>{const w=Math.max(0,parseFloat(tr.querySelector('.w').value)||0),sv=tr.querySelector('.s').value.trim();
+  out[tr.dataset.id]={weight:w,stock:sv===''?null:Math.max(0,parseInt(sv)||0)}});return out}
+function updPct(){const v=readAdmin();const ok=id=>v[id].weight>0&&(v[id].stock==null||v[id].stock>0);const tot=BASE.prizes.reduce((a,p)=>a+(ok(p.id)?v[p.id].weight:0),0);
+  adm.querySelectorAll('#admRows tr').forEach(tr=>{const id=tr.dataset.id;tr.querySelector('.pct').textContent=ok(id)&&tot?(v[id].weight/tot*100).toFixed(1)+'%':'—'})}
+document.getElementById('admSave').onclick=()=>{S.prizes=readAdmin();
+  S.opts.spinSeconds=Math.min(12,Math.max(2,parseFloat(document.getElementById('optSec').value)||5));
+  S.opts.showOdds=document.getElementById('optOdds').checked;S.opts.sound=document.getElementById('optSnd').checked;
+  save();renderCards();buildWheel();adm.classList.remove('show')};
+document.getElementById('admSim').onclick=()=>{const keep=S.prizes;S.prizes=readAdmin();const list=avail();const c={};
+  if(list.length){for(let i=0;i<10000;i++){const p=pickPrize(list);c[p.id]=(c[p.id]||0)+1}}
+  document.getElementById('simOut').textContent=list.length?'1만 회 결과 → '+BASE.prizes.map(p=>`${p.name} ${((c[p.id]||0)/100).toFixed(1)}%`).join(' · '):'당첨 가능한 상품이 없어요';S.prizes=keep};
+document.getElementById('admResetCnt').onclick=()=>{if(!confirm('지급 기록(개수)을 0으로 되돌릴까요? 재고는 그대로입니다.'))return;for(const k in S.given)S.given[k]=0;save();openAdmin()};
+document.getElementById('admDefault').onclick=()=>{if(!confirm('config.js 파일의 기본값으로 되돌릴까요? (지급 기록은 유지)'))return;const g=S.given;S=freshState();S.given=g;save();openAdmin();renderCards();buildWheel()};
+document.getElementById('admExport').onclick=()=>{
+  const v=readAdmin();const c=JSON.parse(JSON.stringify(BASE));
+  c.prizes.forEach(p=>{p.weight=v[p.id].weight;p.stock=v[p.id].stock});
+  c.spinSeconds=parseFloat(document.getElementById('optSec').value)||c.spinSeconds;delete c.suspense;
+  c.showOdds=document.getElementById('optOdds').checked;c.sound=document.getElementById('optSnd').checked;
+  const txt='/* Little Token · G-STAR 2026 룰렛 기본 설정 (설정 패널에서 내보냄) */\nwindow.ROULETTE_CONFIG = '+JSON.stringify(c,null,2)+';\n';
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/javascript'}));a.download='config.js';a.click();
+  document.getElementById('simOut').textContent='config.js 를 다운로드했어요. D:\\룰렛 폴더의 config.js 를 이 파일로 바꿔 넣으면 기본값이 됩니다.'};
+document.getElementById('gear').onclick=openAdmin;
+adm.addEventListener('click',e=>{if(e.target===adm)adm.classList.remove('show')});
+
+/* =================== 입력 =================== */
+spinBtn.onclick=spin;
+document.getElementById('wheelbox').onclick=()=>{if(!busy)spin()};
+document.getElementById('okBtn').onclick=closeResult;
+addEventListener('keydown',e=>{
+  if(adm.classList.contains('show')){if(e.key==='Escape')adm.classList.remove('show');return}
+  const startOpen=document.getElementById('start').classList.contains('show');
+  if(e.key===' '||e.key==='Enter'){e.preventDefault();if(startOpen){document.getElementById('startBtn').click();return}
+    if(document.getElementById('result').classList.contains('show'))closeResult();else spin()}
+  else if(e.key==='f'||e.key==='F'||e.key==='ㄹ')toggleFull();
+  else if(e.key==='s'||e.key==='S'||e.key==='ㄴ')openAdmin();
+});
+
+renderCards();buildWheel();
+// 처음 보이는 각도를 살짝 랜덤
+setRot(Math.random()*360);
+</script>
+</body>
+</html>
