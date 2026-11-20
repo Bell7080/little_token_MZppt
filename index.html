@@ -398,10 +398,11 @@ function freshState(){return{
   prizes:Object.fromEntries(BASE.prizes.map(p=>[p.id,{weight:p.weight,stock:p.stock}])),
   given:Object.fromEntries(BASE.prizes.map(p=>[p.id,0])),
   opts:{spinSeconds:BASE.spinSeconds,showOdds:BASE.showOdds,sound:BASE.sound}}}
+const CFG_SIG=JSON.stringify(BASE.prizes.map(p=>[p.id,p.weight,p.stock]));
 function load(){
-  S=freshState();
-  try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);
-    for(const p of BASE.prizes){if(d.prizes&&d.prizes[p.id])Object.assign(S.prizes[p.id],d.prizes[p.id]);if(d.given&&d.given[p.id]!=null)S.given[p.id]=d.given[p.id]}
+  S=freshState();S.sig=CFG_SIG;
+  try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);const same=d.sig===CFG_SIG; // config.js 기본값이 바뀌면 저장된 가중치·재고는 새 기본값으로
+    for(const p of BASE.prizes){if(same&&d.prizes&&d.prizes[p.id])Object.assign(S.prizes[p.id],d.prizes[p.id]);if(d.given&&d.given[p.id]!=null)S.given[p.id]=d.given[p.id]}
     if(d.opts)Object.assign(S.opts,d.opts)}}catch(e){}
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
@@ -615,7 +616,7 @@ document.getElementById('admSim').onclick=()=>{const keep=S.prizes;S.prizes=read
   if(list.length){for(let i=0;i<10000;i++){const p=pickPrize(list);c[p.id]=(c[p.id]||0)+1}}
   document.getElementById('simOut').textContent=list.length?'1만 회 결과 → '+BASE.prizes.map(p=>`${p.name} ${((c[p.id]||0)/100).toFixed(1)}%`).join(' · '):'당첨 가능한 상품이 없어요';S.prizes=keep};
 document.getElementById('admResetCnt').onclick=()=>{if(!confirm('지급 기록(개수)을 0으로 되돌릴까요? 재고는 그대로입니다.'))return;for(const k in S.given)S.given[k]=0;save();openAdmin()};
-document.getElementById('admDefault').onclick=()=>{if(!confirm('config.js 파일의 기본값으로 되돌릴까요? (지급 기록은 유지)'))return;const g=S.given;S=freshState();S.given=g;save();openAdmin();renderCards();buildWheel()};
+document.getElementById('admDefault').onclick=()=>{if(!confirm('config.js 파일의 기본값으로 되돌릴까요? (지급 기록은 유지)'))return;const g=S.given;S=freshState();S.sig=CFG_SIG;S.given=g;save();openAdmin();renderCards();buildWheel()};
 document.getElementById('admExport').onclick=()=>{
   const v=readAdmin();const c=JSON.parse(JSON.stringify(BASE));
   c.prizes.forEach(p=>{p.weight=v[p.id].weight;p.stock=v[p.id].stock});

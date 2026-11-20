@@ -6,6 +6,8 @@
      가중치·재고를 바꿀 수 있고, 그 값은 이 PC 브라우저에 자동 저장되어
      다음에 다시 열어도 그대로 유지됩니다.
    · 패널의 "파일 기본값으로" 버튼을 누르면 이 파일 값으로 되돌아갑니다.
+   · 이 파일의 가중치·재고를 바꾸면, 브라우저에 저장돼 있던 예전 가중치·재고는
+     자동으로 새 값으로 바뀝니다. (지급 기록은 유지)
    ============================================================ */
 window.ROULETTE_CONFIG = {
   // 상단 문구
@@ -20,17 +22,17 @@ window.ROULETTE_CONFIG = {
   ],
 
   /* 상품 목록
-     weight : 가중치(비율). 60/30/10 이면 60% / 30% / 10%
+     weight : 가중치(비율). 89/10/1 이면 89% / 10% / 1%
               합이 100일 필요는 없음 (예: 6/3/1 도 같은 확률)
      stock  : 남은 재고. null 이면 무제한, 0 이 되면 더 이상 당첨되지 않음
      tier   : "common"(일반) / "rare"(레어) / "epic"(에픽)
               등급이 높을수록 룰렛 표시와 당첨 연출이 화려해짐            */
   prizes: [
-    { id: "sticker", name: "스티커", weight: 60, stock: null, tier: "common",
+    { id: "sticker", name: "스티커", weight: 89, stock: null, tier: "common",
       desc: "적 캐릭터 이미지 스티커!", color: "#ffb7c5", deep: "#d9667f" },
-    { id: "keyring", name: "키링",   weight: 30, stock: null, tier: "rare",
+    { id: "keyring", name: "키링",   weight: 10, stock: null, tier: "rare",
       desc: "리틀토큰 프롬 키링!",      color: "#a8dcff", deep: "#3f8fc4" },
-    { id: "ecobag",  name: "에코백", weight: 10, stock: null, tier: "epic",
+    { id: "ecobag",  name: "에코백", weight: 1, stock: null, tier: "epic",
       desc: "대박! 리틀토큰 에코백!",   color: "#d9b8ff", deep: "#8a4fd0" },
   ],
 
